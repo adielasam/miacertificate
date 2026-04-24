@@ -240,12 +240,26 @@
     z-index: 1;
     padding-top: 24px;
     border-top: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .left-footer p {
     font-size: 11px;
     color: rgba(255,255,255,0.45);
-    text-align: center;
+    margin: 0;
+  }
+
+  /* SECRET ADMIN LINK */
+  .secret-admin-link {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .secret-admin-link:hover {
+    color: rgba(255,255,255,0.8);
   }
 
   /* RIGHT PANEL */
@@ -573,6 +587,7 @@
 
     <div class="left-footer">
       <p>© Microsoft Imagine Academy. All rights reserved.</p>
+      <a href="admin.html" class="secret-admin-link">Admin</a>
     </div>
   </div>
 
@@ -804,11 +819,27 @@ function downloadCertificate(studentName, certId, mappedCertName) {
           ctx.textAlign = 'center';
           ctx.textBaseline = 'alphabetic'; // Aligns the text perfectly flat on the line
 
-          // Solid black text (removed the white shadow from before)
+          // Solid black text
           ctx.fillStyle = '#000000';
           
           // Adjusted Y coordinate (Moved up to ~47% of the image height to sit on the blank line)
           ctx.fillText(studentName, img.width / 2, img.height * 0.47);
+
+          // ======== DRAW THE DATE ISSUED ========
+          if (cert.dateIssued) {
+            const d = new Date(cert.dateIssued);
+            const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); // e.g., 24 April 2026
+            
+            const dateFontSize = Math.max(20, Math.min(36, img.width / 30));
+            ctx.font = `${dateFontSize}px 'Georgia', serif`;
+            ctx.textAlign = 'left';
+            
+            // X and Y coordinates for the date. 
+            // X: 0.18 = 18% from the left edge.
+            // Y: 0.85 = 85% down from the top edge.
+            // You can tweak these numbers slightly if it doesn't align perfectly on your exact template.
+            ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
+          }
 
           // Download
           const link = document.createElement('a');
