@@ -355,6 +355,7 @@
 
   .btn-search:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
   .btn-search:active { transform: translateY(0); }
+  .btn-search:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
 
   .btn-search svg { width: 18px; height: 18px; fill: white; }
 
@@ -452,6 +453,7 @@
   }
 
   .btn-download:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
+  .btn-download:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
   .btn-download svg { width: 16px; height: 16px; fill: white; }
 
   .error-box {
@@ -619,6 +621,32 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+// ===================== DATABASE CONFIG =====================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDW7ODHwsLUleRQOBndTVT_toClQnLytv5DHQzwF4ZIUOjwi5l12mnDIeDpnUteb-8/exec';
+
+async function fetchSheet(sheetName) {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
+    return await res.json();
+  } catch(e) {
+    console.error("Database fetch error:", e);
+    return [];
+  }
+}
+
+async function saveSheet(sheetName, data) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ sheet: sheetName, data: data }),
+      redirect: 'follow'
+    });
+  } catch(e) {
+    console.error("Database save error:", e);
+  }
+}
+
 // ===================== UTILS =====================
 
 function showToast(message, type = 'info', duration = 3500) {
@@ -637,33 +665,24 @@ function showToast(message, type = 'info', duration = 3500) {
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, duration);
 }
 
-function getStudents() {
-  return JSON.parse(localStorage.getItem('mia_students') || '[]');
-}
-
-function getCertificates() {
-  return JSON.parse(localStorage.getItem('mia_certificates') || '[]');
-}
-
-function getNotifications() {
-  return JSON.parse(localStorage.getItem('mia_notifications') || '[]');
-}
-
-function saveNotifications(notifs) {
-  localStorage.setItem('mia_notifications', JSON.stringify(notifs));
-}
-
-function saveStudents(students) {
-  localStorage.setItem('mia_students', JSON.stringify(students));
-}
-
 function getInitials(name) {
+  if (!name) return '';
   return name.trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join('');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
 // ===================== SEARCH =====================
 
-function searchCertificate() {
+async function searchCertificate() {
   const input = document.getElementById('nameInput').value.trim();
   const resultArea = document.getElementById('resultArea');
   const btn = document.getElementById('searchBtn');
@@ -675,40 +694,45 @@ function searchCertificate() {
   }
 
   // Show loading state
-  btn.innerHTML = '<div class="loading-spinner"></div> Searching...';
+  btn.innerHTML = '<div class="loading-spinner"></div> Searching Database...';
   btn.disabled = true;
+  resultArea.innerHTML = '';
 
-  setTimeout(() => {
-    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Certificate`;
-    btn.disabled = false;
-
-    const students = getStudents();
-    const certificates = getCertificates();
+  try {
+    // Fetch data directly from Google Sheets
+    const [students, certificates] = await Promise.all([
+      fetchSheet('Students'),
+      fetchSheet('Certificates')
+    ]);
 
     // Case-insensitive exact match
-    const student = students.find(s => s.fullName.trim().toLowerCase() === input.toLowerCase());
+    const student = students.find(s => (s.fullName || '').trim().toLowerCase() === input.toLowerCase());
 
     if (!student) {
       resultArea.innerHTML = `
         <div class="error-box">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          <p><strong>Result Not Found</strong>Your result is not available. Please check back later or contact your administrator.</p>
+          <p><strong>Result Not Found</strong>Your record is not available in the database. Please check your spelling or contact your administrator.</p>
         </div>`;
+      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Certificate`;
+      btn.disabled = false;
       return;
     }
 
     // Find matching certificate
     const cert = certificates.find(c =>
-      c.course.trim().toLowerCase() === (student.course || '').trim().toLowerCase() &&
-      c.classBatch.trim().toLowerCase() === (student.classBatch || '').trim().toLowerCase()
+      (c.course || '').trim().toLowerCase() === (student.course || '').trim().toLowerCase() &&
+      (c.classBatch || '').trim().toLowerCase() === (student.classBatch || '').trim().toLowerCase()
     );
 
     if (!cert) {
       resultArea.innerHTML = `
         <div class="error-box">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          <p><strong>Certificate Not Ready</strong>Your record was found but your certificate has not been uploaded yet. Please contact your administrator.</p>
+          <p><strong>Certificate Not Ready</strong>Your record was found but your certificate template has not been registered yet. Please contact your administrator.</p>
         </div>`;
+      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Certificate`;
+      btn.disabled = false;
       return;
     }
 
@@ -766,126 +790,130 @@ function searchCertificate() {
           Download Certificate
         </button>
       </div>`;
-  }, 800);
-}
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function escapeAttr(str) {
-  if (!str) return '';
-  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-}
-
-// ===================== DOWNLOAD & CANVAS FIX =====================
-
-function downloadCertificate(studentName, certId, mappedCertName) {
-  const certificates = getCertificates();
-  const cert = certificates.find(c => c.id === certId);
-
-  if (!cert || !cert.fileData) {
-    showToast('Certificate file not found. Please contact administrator.', 'error');
-    return;
+  } catch (error) {
+    showToast('Failed to connect to database. Please check your connection.', 'error');
   }
 
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Certificate`;
+  btn.disabled = false;
+}
+
+// ===================== DOWNLOAD & CANVAS =====================
+
+async function downloadCertificate(studentName, certId, mappedCertName) {
   const btn = document.querySelector('.btn-download');
   const origHTML = btn.innerHTML;
   btn.innerHTML = '<div class="loading-spinner"></div> Preparing Download...';
   btn.disabled = true;
 
-  setTimeout(() => {
-    try {
-      if (cert.fileType === 'pdf') {
-        // Download PDF as-is
-        const link = document.createElement('a');
-        link.href = cert.fileData;
-        link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`;
-        link.click();
-      } else {
-        // Draw image on canvas with name overlay
-        const img = new Image();
-        img.onload = function () {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
+  try {
+    const certificates = await fetchSheet('Certificates');
+    const cert = certificates.find(c => c.id === certId);
 
-          // Name overlay settings - Adjusted for Black Bold Text
-          const fontSize = Math.max(48, Math.min(90, img.width / 14));
-          ctx.font = `bold ${fontSize}px 'Georgia', serif`; // Classy bold font for certificates
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'alphabetic'; // Aligns the text perfectly flat on the line
-
-          // Solid black text
-          ctx.fillStyle = '#000000';
-          
-          // Adjusted Y coordinate (Moved up to ~47% of the image height to sit on the blank line)
-          ctx.fillText(studentName, img.width / 2, img.height * 0.47);
-
-          // ======== DRAW THE DATE ISSUED ========
-          if (cert.dateIssued) {
-            const d = new Date(cert.dateIssued);
-            const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); // e.g., 24 April 2026
-            
-            const dateFontSize = Math.max(20, Math.min(36, img.width / 30));
-            ctx.font = `${dateFontSize}px 'Georgia', serif`;
-            ctx.textAlign = 'left';
-            
-            // X and Y coordinates for the date. 
-            // X: 0.18 = 18% from the left edge.
-            // Y: 0.85 = 85% down from the top edge.
-            // You can tweak these numbers slightly if it doesn't align perfectly on your exact template.
-            ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
-          }
-
-          // Download
-          const link = document.createElement('a');
-          link.href = canvas.toDataURL('image/png');
-          link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`;
-          link.click();
-        };
-        img.src = cert.fileData;
-      }
-
-      // Log download notification
-      logDownload(studentName, cert, mappedCertName);
-      showToast('Certificate downloaded successfully!', 'success');
-    } catch (e) {
-      showToast('Download failed. Please try again.', 'error');
+    if (!cert || !cert.fileData) {
+      showToast('Certificate template not configured correctly.', 'error');
+      btn.innerHTML = origHTML;
+      btn.disabled = false;
+      return;
     }
 
+    // Since we now use filenames from GitHub (e.g. msword-cert.png), fileData is the filename/URL.
+    if (cert.fileType === 'pdf') {
+      const link = document.createElement('a');
+      link.href = cert.fileData;
+      link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`;
+      link.click();
+      await logDownload(studentName, cert, mappedCertName);
+      showToast('Certificate downloaded successfully!', 'success');
+      btn.innerHTML = origHTML;
+      btn.disabled = false;
+    } else {
+      const img = new Image();
+      // Crucial for loading images directly from the same GitHub domain
+      img.crossOrigin = "Anonymous"; 
+      
+      img.onload = async function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        // Print Student Name
+        const fontSize = Math.max(48, Math.min(90, img.width / 14));
+        ctx.font = `bold ${fontSize}px 'Georgia', serif`; 
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic'; 
+        ctx.fillStyle = '#000000';
+        ctx.fillText(studentName, img.width / 2, img.height * 0.47);
+
+        // Print Date Issued
+        if (cert.dateIssued) {
+          const d = new Date(cert.dateIssued);
+          const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+          const dateFontSize = Math.max(20, Math.min(36, img.width / 30));
+          ctx.font = `${dateFontSize}px 'Georgia', serif`;
+          ctx.textAlign = 'left';
+          ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
+        }
+
+        // Trigger Download
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`;
+        link.click();
+
+        await logDownload(studentName, cert, mappedCertName);
+        showToast('Certificate downloaded successfully!', 'success');
+        
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+      };
+
+      img.onerror = function() {
+        showToast('Error loading the certificate image. Verify the file name on GitHub.', 'error');
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+      };
+
+      // Set source to the filename listed in Google Sheets (e.g. msword-cert.png)
+      img.src = cert.fileData; 
+    }
+  } catch (e) {
+    console.error(e);
+    showToast('Download failed. Please check connection.', 'error');
     btn.innerHTML = origHTML;
     btn.disabled = false;
-  }, 600);
-}
-
-function logDownload(studentName, cert, mappedCertName) {
-  // Log notification
-  const notifs = getNotifications();
-  notifs.unshift({
-    id: Date.now().toString(),
-    studentName: studentName,
-    certName: mappedCertName || cert.certName,
-    course: 'Microsoft Office',
-    classBatch: cert.classBatch,
-    timestamp: new Date().toISOString(),
-    read: false
-  });
-  saveNotifications(notifs);
-
-  // Update download count on student
-  const students = getStudents();
-  const idx = students.findIndex(s => s.fullName.trim().toLowerCase() === studentName.trim().toLowerCase());
-  if (idx !== -1) {
-    students[idx].downloadCount = (students[idx].downloadCount || 0) + 1;
-    saveStudents(students);
   }
 }
 
-// ===================== EVENT LISTENERS =====================
+async function logDownload(studentName, cert, mappedCertName) {
+  try {
+    // 1. Add notification
+    const notifs = await fetchSheet('Notifications');
+    notifs.unshift({
+      id: Date.now().toString(),
+      studentName: studentName,
+      certName: mappedCertName || cert.certName,
+      course: 'Microsoft Office',
+      classBatch: cert.classBatch,
+      timestamp: new Date().toISOString(),
+      read: false
+    });
+    await saveSheet('Notifications', notifs);
+
+    // 2. Update Student Download Count
+    const students = await fetchSheet('Students');
+    const idx = students.findIndex(s => (s.fullName || '').trim().toLowerCase() === studentName.trim().toLowerCase());
+    if (idx !== -1) {
+      students[idx].downloadCount = (parseInt(students[idx].downloadCount) || 0) + 1;
+      await saveSheet('Students', students);
+    }
+  } catch(e) {
+    console.error("Could not sync download log to database.", e);
+  }
+}
 
 document.getElementById('nameInput').addEventListener('keydown', function (e) {
   if (e.key === 'Enter') searchCertificate();
