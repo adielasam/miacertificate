@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft Imagine Academy — Certificate Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ms-green: #107C10;
+    --ms-green-dark: #0a5a0a;
+    --ms-green-light: #16a016;
+    --ms-green-pale: #e8f5e8;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-600: #475569;
+    --gray-800: #1e293b;
+    --error: #dc2626;
+    --error-bg: #fef2f2;
+    --error-border: #fecaca;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
+    background: var(--gray-100);
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  .portal-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 600px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    width: 380px;
+    min-width: 320px;
+    background: var(--ms-green);
+    color: white;
+    padding: 48px 36px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .dot-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+
+  .brand-section { position: relative; z-index: 1; }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .logo-img-wrap {
+    width: 52px;
+    height: 52px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .logo-img-wrap img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+  }
+
+  .logo-fallback {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ms-squares {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .ms-sq {
+    border-radius: 2px;
+  }
+  .ms-sq:nth-child(1) { background: #f25022; }
+  .ms-sq:nth-child(2) { background: #7fba00; }
+  .ms-sq:nth-child(3) { background: #00a4ef; }
+  .ms-sq:nth-child(4) { background: #ffb900; }
+
+  .brand-text h1 {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: white;
+  }
+
+  .brand-text span {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .left-heading {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    color: white;
+  }
+
+  .left-sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.6;
+    margin-bottom: 36px;
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.18);
+    margin-bottom: 28px;
+  }
+
+  .contact-info { position: relative; z-index: 1; }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .contact-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .contact-icon svg {
+    width: 15px;
+    height: 15px;
+    fill: white;
+    opacity: 0.9;
+  }
+
+  .contact-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+
+  .contact-value {
+    font-size: 13px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.4;
+  }
+
+  .left-footer {
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .left-footer p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    text-align: center;
+  }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    flex: 1;
+    background: var(--white);
+    padding: 48px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .right-header {
+    margin-bottom: 36px;
+  }
+
+  .right-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--gray-800);
+    margin-bottom: 8px;
+  }
+
+  .right-header p {
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.6;
+  }
+
+  .search-group { margin-bottom: 20px; }
+
+  .search-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 8px;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap input {
+    width: 100%;
+    padding: 14px 18px 14px 48px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .input-wrap input:focus {
+    border-color: var(--ms-green);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(16,124,16,0.1);
+  }
+
+  .input-wrap input::placeholder { color: var(--gray-400); }
+
+  .input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+  }
+
+  .input-icon svg { width: 18px; height: 18px; fill: currentColor; }
+
+  .btn-search {
+    width: 100%;
+    padding: 15px;
+    background: var(--ms-green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-search:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
+  .btn-search:active { transform: translateY(0); }
+
+  .btn-search svg { width: 18px; height: 18px; fill: white; }
+
+  /* RESULT AREA */
+  .result-area { margin-top: 28px; }
+
+  .result-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 28px;
+    animation: slideIn 0.4s ease both;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .result-avatar {
+    width: 52px;
+    height: 52px;
+    background: var(--ms-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .result-name { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+  .result-badge {
+    display: inline-block;
+    background: var(--ms-green-pale);
+    color: var(--ms-green-dark);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .result-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+
+  .result-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 4px;
+  }
+
+  .result-field span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+
+  .btn-download {
+    width: 100%;
+    padding: 14px;
+    background: var(--ms-green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-download:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
+  .btn-download svg { width: 16px; height: 16px; fill: white; }
+
+  .error-box {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: slideIn 0.3s ease both;
+  }
+
+  .error-box svg { width: 20px; height: 20px; fill: var(--error); flex-shrink: 0; margin-top: 1px; }
+  .error-box p { font-size: 14px; color: #991b1b; line-height: 1.5; }
+  .error-box strong { display: block; font-weight: 700; margin-bottom: 4px; }
+
+  /* TOAST */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+  }
+
+  .toast {
+    background: var(--gray-800);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastIn 0.3s ease both;
+    max-width: 340px;
+  }
+
+  .toast.success { background: var(--ms-green); }
+  .toast.error { background: var(--error); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .loading-spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .portal-wrapper { flex-direction: column; border-radius: 20px; }
+    .left-panel { width: 100%; min-width: 0; padding: 32px 24px; }
+    .right-panel { padding: 32px 24px; }
+    .result-fields { grid-template-columns: 1fr; }
+    .contact-info { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="portal-wrapper">
+  <div class="left-panel">
+    <div class="dot-grid"></div>
+    <div class="brand-section">
+      <div class="logo-area">
+        <div class="logo-img-wrap">
+          <img src="logo.png" alt="Microsoft Imagine Academy Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="logo-fallback" style="display:none;">
+            <div class="ms-squares">
+              <div class="ms-sq"></div>
+              <div class="ms-sq"></div>
+              <div class="ms-sq"></div>
+              <div class="ms-sq"></div>
+            </div>
+          </div>
+        </div>
+        <div class="brand-text">
+          <h1>Microsoft<br>Imagine Academy</h1>
+          <span>Empowering Digital Futures</span>
+        </div>
+      </div>
+
+      <h2 class="left-heading">Certificate<br>Verification<br>Portal</h2>
+      <p class="left-sub">Verify and download your official Microsoft Imagine Academy certificates securely and instantly.</p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="contact-info">
+      <a href="https://dorvastechnologies.vercel.app/" target="_blank" style="text-decoration:none; color:inherit;">
+        <div class="contact-item" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+          </div>
+          <div>
+            <div class="contact-label">Developer</div>
+            <div class="contact-value">Dorvas Technologies</div>
+          </div>
+        </div>
+      </a>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </div>
+        <div>
+          <div class="contact-label">Phone</div>
+          <div class="contact-value">(234)08162337303</div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-value">microsoftportharcourt@gmail.com</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-footer">
+      <p>© Microsoft Imagine Academy. All rights reserved.</p>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="right-header">
+      <h2>Find Your Certificate</h2>
+      <p>Enter your full name exactly as registered to locate and download your certificate.</p>
+    </div>
+
+    <div class="search-group">
+      <label for="nameInput">Full Name</label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </span>
+        <input type="text" id="nameInput" placeholder="e.g. John Adebayo Doe" autocomplete="off">
+      </div>
+    </div>
+
+    <button class="btn-search" id="searchBtn" onclick="searchCertificate()">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      Search Certificate
+    </button>
+
+    <div class="result-area" id="resultArea"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ===================== UTILS =====================
+
+function showToast(message, type = 'info', duration = 3500) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  const icons = {
+    success: `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`,
+    error: `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+    info: `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`
+  };
+
+  toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, duration);
+}
+
+function getStudents() {
+  return JSON.parse(localStorage.getItem('mia_students') || '[]');
+}
+
+function getCertificates() {
+  return JSON.parse(localStorage.getItem('mia_certificates') || '[]');
+}
+
+function getNotifications() {
+  return JSON.parse(localStorage.getItem('mia_notifications') || '[]');
+}
+
+function saveNotifications(notifs) {
+  localStorage.setItem('mia_notifications', JSON.stringify(notifs));
+}
+
+function saveStudents(students) {
+  localStorage.setItem('mia_students', JSON.stringify(students));
+}
+
+function getInitials(name) {
+  return name.trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join('');
+}
+
+// ===================== SEARCH =====================
+
+function searchCertificate() {
+  const input = document.getElementById('nameInput').value.trim();
+  const resultArea = document.getElementById('resultArea');
+  const btn = document.getElementById('searchBtn');
+
+  if (!input) {
+    showToast('Please enter your full name to search.', 'error');
+    document.getElementById('nameInput').focus();
+    return;
+  }
+
+  // Show loading state
+  btn.innerHTML = '<div class="loading-spinner"></div> Searching...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Certificate`;
+    btn.disabled = false;
+
+    const students = getStudents();
+    const certificates = getCertificates();
+
+    // Case-insensitive exact match
+    const student = students.find(s => s.fullName.trim().toLowerCase() === input.toLowerCase());
+
+    if (!student) {
+      resultArea.innerHTML = `
+        <div class="error-box">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <p><strong>Result Not Found</strong>Your result is not available. Please check back later or contact your administrator.</p>
+        </div>`;
+      return;
+    }
+
+    // Find matching certificate
+    const cert = certificates.find(c =>
+      c.course.trim().toLowerCase() === (student.course || '').trim().toLowerCase() &&
+      c.classBatch.trim().toLowerCase() === (student.classBatch || '').trim().toLowerCase()
+    );
+
+    if (!cert) {
+      resultArea.innerHTML = `
+        <div class="error-box">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <p><strong>Certificate Not Ready</strong>Your record was found but your certificate has not been uploaded yet. Please contact your administrator.</p>
+        </div>`;
+      return;
+    }
+
+    // Map the Certificate Name dynamically based on the student's original course
+    let mappedCertName = cert.certName;
+    const sCourse = (student.course || '').toLowerCase();
+    
+    if (sCourse.includes('word')) {
+      mappedCertName = 'Microsoft Office Specialist (MOS) Exam 77-725 Word 2016';
+    } else if (sCourse.includes('excel')) {
+      mappedCertName = 'Microsoft Office Specialist (MOS) Exam 77-727 Excel 2016';
+    } else if (sCourse.includes('powerpoint')) {
+      mappedCertName = 'Microsoft Office Specialist (MOS) Exam 77-729 PowerPoint 2016';
+    }
+
+    const dateFormatted = cert.dateIssued ? new Date(cert.dateIssued).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A';
+
+    resultArea.innerHTML = `
+      <div class="result-card">
+        <div class="result-card-header">
+          <div class="result-avatar">${getInitials(student.fullName)}</div>
+          <div>
+            <div class="result-name">${escapeHtml(student.fullName)}</div>
+            <span class="result-badge">✓ Certificate Found</span>
+          </div>
+        </div>
+        <div class="result-fields">
+          <div class="result-field">
+            <label>Certificate Name</label>
+            <span>${escapeHtml(mappedCertName)}</span>
+          </div>
+          <div class="result-field">
+            <label>Course</label>
+            <span>Microsoft Office</span>
+          </div>
+          <div class="result-field">
+            <label>Class / Batch</label>
+            <span>${escapeHtml(student.classBatch || 'N/A')}</span>
+          </div>
+          <div class="result-field">
+            <label>Date Issued</label>
+            <span>${dateFormatted}</span>
+          </div>
+          ${cert.issuingAuthority ? `<div class="result-field">
+            <label>Issuing Authority</label>
+            <span>${escapeHtml(cert.issuingAuthority)}</span>
+          </div>` : ''}
+          ${cert.certType ? `<div class="result-field">
+            <label>Certificate Type</label>
+            <span>${escapeHtml(cert.certType)}</span>
+          </div>` : ''}
+        </div>
+        <button class="btn-download" onclick="downloadCertificate('${escapeAttr(student.fullName)}', '${escapeAttr(cert.id)}', '${escapeAttr(mappedCertName)}')">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download Certificate
+        </button>
+      </div>`;
+  }, 800);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ===================== DOWNLOAD & CANVAS FIX =====================
+
+function downloadCertificate(studentName, certId, mappedCertName) {
+  const certificates = getCertificates();
+  const cert = certificates.find(c => c.id === certId);
+
+  if (!cert || !cert.fileData) {
+    showToast('Certificate file not found. Please contact administrator.', 'error');
+    return;
+  }
+
+  const btn = document.querySelector('.btn-download');
+  const origHTML = btn.innerHTML;
+  btn.innerHTML = '<div class="loading-spinner"></div> Preparing Download...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    try {
+      if (cert.fileType === 'pdf') {
+        // Download PDF as-is
+        const link = document.createElement('a');
+        link.href = cert.fileData;
+        link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`;
+        link.click();
+      } else {
+        // Draw image on canvas with name overlay
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          // Name overlay settings - Adjusted for Black Bold Text
+          const fontSize = Math.max(48, Math.min(90, img.width / 14));
+          ctx.font = `bold ${fontSize}px 'Georgia', serif`; // Classy bold font for certificates
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'alphabetic'; // Aligns the text perfectly flat on the line
+
+          // Solid black text (removed the white shadow from before)
+          ctx.fillStyle = '#000000';
+          
+          // Adjusted Y coordinate (Moved up to ~47% of the image height to sit on the blank line)
+          ctx.fillText(studentName, img.width / 2, img.height * 0.47);
+
+          // Download
+          const link = document.createElement('a');
+          link.href = canvas.toDataURL('image/png');
+          link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`;
+          link.click();
+        };
+        img.src = cert.fileData;
+      }
+
+      // Log download notification
+      logDownload(studentName, cert, mappedCertName);
+      showToast('Certificate downloaded successfully!', 'success');
+    } catch (e) {
+      showToast('Download failed. Please try again.', 'error');
+    }
+
+    btn.innerHTML = origHTML;
+    btn.disabled = false;
+  }, 600);
+}
+
+function logDownload(studentName, cert, mappedCertName) {
+  // Log notification
+  const notifs = getNotifications();
+  notifs.unshift({
+    id: Date.now().toString(),
+    studentName: studentName,
+    certName: mappedCertName || cert.certName,
+    course: 'Microsoft Office',
+    classBatch: cert.classBatch,
+    timestamp: new Date().toISOString(),
+    read: false
+  });
+  saveNotifications(notifs);
+
+  // Update download count on student
+  const students = getStudents();
+  const idx = students.findIndex(s => s.fullName.trim().toLowerCase() === studentName.trim().toLowerCase());
+  if (idx !== -1) {
+    students[idx].downloadCount = (students[idx].downloadCount || 0) + 1;
+    saveStudents(students);
+  }
+}
+
+// ===================== EVENT LISTENERS =====================
+
+document.getElementById('nameInput').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') searchCertificate();
+});
+
+// Show logo fallback properly on load
+document.querySelectorAll('.logo-img-wrap img').forEach(img => {
+  if (!img.complete || img.naturalWidth === 0) {
+    img.style.display = 'none';
+    img.nextElementSibling.style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
