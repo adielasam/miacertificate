@@ -246,9 +246,6 @@ tr:hover td { background: var(--gray-50); }
 .notif-detail { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
 .notif-time { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
 
-.loading-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
 
 /* ======= MOBILE RESPONSIVENESS ======= */
@@ -446,7 +443,7 @@ tr:hover td { background: var(--gray-50); }
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+            <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
             <div class="stat-info">
               <div class="stat-value" id="statUnread">0</div>
               <div class="stat-label">Pending Notifications</div>
@@ -956,12 +953,10 @@ async function showSection(name, btn) {
 }
 
 // ===================== STUDENT UPLOAD =====================
-// ACCEPTED MODIFICATION: Added .csv to logic
 function handleStudentFile(file) {
   if (!file) return;
   const ext = file.name.split('.').pop().toLowerCase();
   
-  // NEW RULE: Accept xlsx, xls, AND csv
   if (!['xlsx', 'xls', 'csv'].includes(ext)) { 
     showToast('Please upload an Excel or CSV file (.xlsx, .xls, .csv)', 'error'); 
     return; 
@@ -970,22 +965,37 @@ function handleStudentFile(file) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const wb = XLSX.read(e.target.result, { type: 'binary' });
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-      if (rows.length < 2) { showToast('File appears empty or has no data rows.', 'error'); return; }
+      if (!rows || rows.length < 2) { 
+        showToast('File appears empty or has no data rows.', 'error'); 
+        return; 
+      }
 
-      const headers = rows[0].map(h => String(h).toLowerCase().trim());
+      // Clean headers from invisible BOM characters often present in CSVs
+      const headers = rows[0].map(h => String(h).replace(/^\uFEFF/, '').toLowerCase().trim());
       const colMap = {};
+      
       headers.forEach((h, i) => {
         if (h.includes('full') || h === 'name') colMap.fullName = i;
         if (h === 'course') colMap.course = i;
-        if (h.includes('class') || h.includes('batch')) colMap.classBatch = i;
+        
+        // Intelligent fallback for mapping "Class" and "Batch" if they are separate columns
+        if (h.includes('batch')) colMap.batch = i;
+        if (h.includes('class')) colMap.class = i;
+        
         if (h.includes('email')) colMap.email = i;
         if (h.includes('phone') || h.includes('tel')) colMap.phone = i;
       });
 
+      // Prefer "Batch" column for the classBatch value if both Class and Batch exist (specific to your CSV format)
+      if (colMap.batch !== undefined) colMap.classBatch = colMap.batch;
+      else if (colMap.class !== undefined) colMap.classBatch = colMap.class;
+
+      // Fallbacks just in case headers don't match
       if (colMap.fullName === undefined) colMap.fullName = 0;
       if (colMap.course === undefined) colMap.course = 1;
       if (colMap.classBatch === undefined) colMap.classBatch = 2;
@@ -1014,10 +1024,12 @@ function handleStudentFile(file) {
 
       document.getElementById('importPreview').style.display = 'block';
     } catch (err) {
+      console.error(err);
       showToast('Failed to parse file. Please check the format.', 'error');
     }
   };
-  reader.readAsBinaryString(file);
+  // Read as ArrayBuffer ensures seamless parsing of all Excel types and CSV encodings
+  reader.readAsArrayBuffer(file);
 }
 
 async function confirmImport() {
