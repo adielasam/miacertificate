@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Microsoft Imagine Academy — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<!-- FIX #1: Switched from cdn.sheetjs.com (requires paid license, often fails) to unpkg which hosts the free community version -->
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -48,7 +49,6 @@
 
 html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; background: var(--gray-100); color: var(--gray-800); }
 
-/* ======= GLOBAL LOADER ======= */
 #globalLoader {
   display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 99999; 
   align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(2px);
@@ -57,9 +57,9 @@ html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; backgr
   width: 48px; height: 48px; border: 4px solid var(--ms-green-pale); border-top-color: var(--ms-green);
   border-radius: 50%; animation: spin 1s linear infinite;
 }
+@keyframes spin { to { transform: rotate(360deg); } }
 .loader-text { margin-top: 16px; font-size: 14px; font-weight: 700; color: var(--ms-green-dark); }
 
-/* ======= SHARED LOGO STYLES ======= */
 .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; position: relative; z-index: 1; }
 .logo-img-wrap { width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; flex-shrink: 0; }
 .logo-img-wrap img { width: 40px; height: 40px; object-fit: contain; }
@@ -73,7 +73,6 @@ html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; backgr
 .brand-text h1 { font-size: 15px; font-weight: 700; color: white; line-height: 1.2; margin: 0; }
 .brand-text span { font-size: 11px; color: rgba(255,255,255,0.7); }
 
-/* ======= LOGIN PAGE ======= */
 #loginPage { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
 .login-wrapper { display: flex; width: 100%; max-width: 880px; min-height: 520px; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-lg); animation: fadeUp 0.5s ease both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
@@ -104,7 +103,6 @@ html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; backgr
 .login-error { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: var(--radius-xs); padding: 12px 16px; font-size: 13px; color: #991b1b; margin-bottom: 18px; display: none; }
 .login-error.show { display: block; }
 
-/* ======= DASHBOARD LAYOUT ======= */
 #dashboardPage { display: none; min-height: 100vh; position: relative; }
 .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w); background: var(--ms-green); display: flex; flex-direction: column; z-index: 100; overflow-y: auto; transition: transform 0.3s ease; }
 .sidebar-brand { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.12); }
@@ -122,7 +120,6 @@ html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; backgr
 .btn-logout:hover { background: rgba(255,255,255,0.16); color: white; }
 .btn-logout svg { width: 16px; height: 16px; fill: currentColor; }
 
-/* MAIN CONTENT */
 .main-content { margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; }
 .topbar { height: var(--topbar-h); background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 28px; gap: 16px; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow-sm); }
 .mobile-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--gray-700); padding: 6px; border-radius: 6px; }
@@ -136,12 +133,10 @@ html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; backgr
 .admin-name { font-size: 13px; font-weight: 600; color: var(--ms-green-dark); }
 .page-content { flex: 1; padding: 28px; }
 
-/* SECTIONS */
 .section { display: none; }
 .section.active { display: block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* STAT CARDS & OTHER UI */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
 .stat-card { background: white; border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 16px; border: 1px solid var(--gray-200); transition: all 0.2s; }
 .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
@@ -191,6 +186,7 @@ tr:hover td { background: var(--gray-50); }
 .form-group-dash input, .form-group-dash select, .form-group-dash textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-xs); font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--gray-800); background: var(--gray-50); outline: none; transition: all 0.15s; }
 .form-group-dash input:focus, .form-group-dash select:focus { border-color: var(--ms-green); background: white; box-shadow: 0 0 0 3px rgba(16,124,16,0.08); }
 
+/* FIX #2: Upload zone now has proper drag-over visual state via JS class toggling */
 .upload-zone { border: 2px dashed var(--gray-300); border-radius: var(--radius); padding: 40px 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--gray-50); }
 .upload-zone:hover, .upload-zone.drag-over { border-color: var(--ms-green); background: var(--ms-green-pale); }
 .upload-zone svg { width: 40px; height: 40px; fill: var(--gray-300); margin-bottom: 12px; }
@@ -198,6 +194,13 @@ tr:hover td { background: var(--gray-50); }
 .upload-zone h4 { font-size: 15px; font-weight: 700; color: var(--gray-700); margin-bottom: 4px; }
 .upload-zone p { font-size: 13px; color: var(--gray-400); }
 .upload-zone .accepted { font-size: 11px; color: var(--gray-400); margin-top: 8px; }
+
+/* Upload status banner shown inside the zone after file is selected */
+.upload-status { display: none; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-xs); margin-top: 12px; font-size: 13px; font-weight: 600; }
+.upload-status.show { display: flex; }
+.upload-status.processing { background: var(--info-bg); color: var(--info); }
+.upload-status.ready { background: var(--success-bg); color: var(--success); }
+.upload-status.err { background: var(--error-bg); color: var(--error); }
 
 .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
 .empty-state svg { width: 52px; height: 52px; fill: var(--gray-300); margin-bottom: 14px; }
@@ -248,7 +251,6 @@ tr:hover td { background: var(--gray-50); }
 
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
 
-/* ======= MOBILE RESPONSIVENESS ======= */
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
@@ -279,7 +281,6 @@ tr:hover td { background: var(--gray-50); }
   <div class="login-wrapper">
     <div class="login-left">
       <div class="dot-grid"></div>
-      
       <div class="logo-area" style="margin-bottom: 24px;">
         <div class="logo-img-wrap">
           <img src="logo.png" alt="Microsoft Imagine Academy Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -294,19 +295,16 @@ tr:hover td { background: var(--gray-50); }
           <span>Admin Portal</span>
         </div>
       </div>
-
       <h2>Admin Dashboard</h2>
       <p>Manage students, certificates, and track all certificate activity in one place securely linked to Google Sheets.</p>
       <div class="login-left-footer" style="margin-top:auto">
         <p>© Microsoft Imagine Academy</p>
       </div>
     </div>
-
     <div class="login-right">
       <h3>Welcome Back</h3>
       <p class="sub">Sign in to access the admin dashboard</p>
       <div class="login-error" id="loginError">Invalid username or password. Please try again.</div>
-
       <div class="form-group">
         <label>Email / Username</label>
         <div class="input-wrap">
@@ -314,7 +312,6 @@ tr:hover td { background: var(--gray-50); }
           <input type="text" id="loginUser" placeholder="admin@email.com" autocomplete="username">
         </div>
       </div>
-
       <div class="form-group">
         <label>Password</label>
         <div class="input-wrap">
@@ -325,7 +322,6 @@ tr:hover td { background: var(--gray-50); }
           </button>
         </div>
       </div>
-
       <button class="btn-primary" onclick="doLogin()">
         <svg viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
         Sign In
@@ -336,7 +332,6 @@ tr:hover td { background: var(--gray-50); }
 
 <div id="dashboardPage">
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
   <div class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="logo-area" style="margin-bottom: 0;">
@@ -354,14 +349,12 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
     </div>
-
     <nav class="sidebar-nav">
       <div class="nav-section-label">Main</div>
       <button class="nav-item active" onclick="showSection('dashboard', this)">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></span>
         Dashboard
       </button>
-
       <div class="nav-section-label">Management</div>
       <button class="nav-item" onclick="showSection('uploadStudents', this)">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></span>
@@ -371,7 +364,6 @@ tr:hover td { background: var(--gray-50); }
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
         Register Certificates
       </button>
-
       <div class="nav-section-label">Records</div>
       <button class="nav-item" onclick="showSection('studentRecords', this)">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.33C18 2.52 15.52 1 13 1c-1.4 0-2.71.59-3.71 1.57L8 3.86 6.71 2.57C5.71 1.59 4.4 1 3 1 .48 1 0 3.52 0 4.67 0 5.12.11 5.56.18 6H-2v2h22V6zm-5 2H9V6h6v2zM4 10v12h16V10H4zm8 11l-5-5 1.41-1.41L12 18.17l7.59-7.59L21 12l-9 9z"/></svg></span>
@@ -391,7 +383,6 @@ tr:hover td { background: var(--gray-50); }
         Settings
       </button>
     </nav>
-
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="doLogout()">
         <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
@@ -407,7 +398,7 @@ tr:hover td { background: var(--gray-50); }
       </button>
       <div>
         <div class="topbar-title" id="pageTitle">Dashboard</div>
-        <div class="topbar-sub" id="pageSub" style="display:none;">Overview of all activity</div> 
+        <div class="topbar-sub" id="pageSub" style="display:none;">Overview of all activity</div>
       </div>
       <div class="topbar-right">
         <div class="admin-chip">
@@ -419,38 +410,26 @@ tr:hover td { background: var(--gray-50); }
 
     <div class="page-content">
 
+      <!-- DASHBOARD -->
       <div class="section active" id="sec-dashboard">
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
-            <div class="stat-info">
-              <div class="stat-value" id="statStudents">0</div>
-              <div class="stat-label">Total Students</div>
-            </div>
+            <div class="stat-info"><div class="stat-value" id="statStudents">0</div><div class="stat-label">Total Students</div></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
-            <div class="stat-info">
-              <div class="stat-value" id="statCerts">0</div>
-              <div class="stat-label">Certificates Uploaded</div>
-            </div>
+            <div class="stat-info"><div class="stat-value" id="statCerts">0</div><div class="stat-label">Certificates Uploaded</div></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
-            <div class="stat-info">
-              <div class="stat-value" id="statDownloads">0</div>
-              <div class="stat-label">Total Downloads</div>
-            </div>
+            <div class="stat-info"><div class="stat-value" id="statDownloads">0</div><div class="stat-label">Total Downloads</div></div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
-            <div class="stat-info">
-              <div class="stat-value" id="statUnread">0</div>
-              <div class="stat-label">Pending Notifications</div>
-            </div>
+            <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+            <div class="stat-info"><div class="stat-value" id="statUnread">0</div><div class="stat-label">Pending Notifications</div></div>
           </div>
         </div>
-
         <div class="card">
           <div class="card-header">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
@@ -459,13 +438,13 @@ tr:hover td { background: var(--gray-50); }
           <div class="card-body" id="activityFeed">
             <div class="empty-state">
               <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-              <h4>No Activity Yet</h4>
-              <p>Student certificate downloads will appear here.</p>
+              <h4>No Activity Yet</h4><p>Student certificate downloads will appear here.</p>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- UPLOAD STUDENTS -->
       <div class="section" id="sec-uploadStudents">
         <div class="card" style="margin-bottom:20px">
           <div class="card-header">
@@ -473,12 +452,15 @@ tr:hover td { background: var(--gray-50); }
             <h3>Upload Students from Excel or CSV</h3>
           </div>
           <div class="card-body">
+            <!-- FIX #3: Drop zone — drag events are now wired via JS in initDropZone() below -->
             <div class="upload-zone" id="studentDropZone" onclick="document.getElementById('studentFileInput').click()">
               <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
               <h4>Drop Excel or CSV File Here</h4>
               <p>or click to browse</p>
-              <div class="accepted">Accepted formats: .xlsx, .xls, .csv</div>
+              <div class="accepted">Accepted: .xlsx &nbsp;·&nbsp; .xls &nbsp;·&nbsp; .csv</div>
             </div>
+            <!-- Status banner shown while parsing -->
+            <div class="upload-status" id="uploadStatus"></div>
             <input type="file" id="studentFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleStudentFile(this.files[0])">
 
             <div id="importPreview" style="display:none; margin-top:20px;">
@@ -488,7 +470,7 @@ tr:hover td { background: var(--gray-50); }
                   <button class="btn btn-outline btn-sm" onclick="cancelImport()">Cancel</button>
                   <button class="btn btn-green btn-sm" onclick="confirmImport()">
                     <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-                    Confirm
+                    Confirm Import
                   </button>
                 </div>
               </div>
@@ -509,26 +491,11 @@ tr:hover td { background: var(--gray-50); }
           </div>
           <div class="card-body">
             <div class="form-row">
-              <div class="form-group-dash">
-                <label>Full Name *</label>
-                <input type="text" id="manFullName" placeholder="e.g. John Adebayo Doe">
-              </div>
-              <div class="form-group-dash">
-                <label>Course *</label>
-                <input type="text" id="manCourse" placeholder="e.g. Microsoft Azure Fundamentals">
-              </div>
-              <div class="form-group-dash">
-                <label>Class / Batch *</label>
-                <input type="text" id="manBatch" placeholder="e.g. Batch 2024-A">
-              </div>
-              <div class="form-group-dash">
-                <label>Email</label>
-                <input type="email" id="manEmail" placeholder="student@email.com">
-              </div>
-              <div class="form-group-dash">
-                <label>Phone</label>
-                <input type="text" id="manPhone" placeholder="+234 xxx xxx xxxx">
-              </div>
+              <div class="form-group-dash"><label>Full Name *</label><input type="text" id="manFullName" placeholder="e.g. John Adebayo Doe"></div>
+              <div class="form-group-dash"><label>Course *</label><input type="text" id="manCourse" placeholder="e.g. Microsoft Azure Fundamentals"></div>
+              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="manBatch" placeholder="e.g. Batch 2024-A"></div>
+              <div class="form-group-dash"><label>Email</label><input type="email" id="manEmail" placeholder="student@email.com"></div>
+              <div class="form-group-dash"><label>Phone</label><input type="text" id="manPhone" placeholder="+234 xxx xxx xxxx"></div>
             </div>
             <button class="btn btn-green" onclick="addStudentManually()">
               <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
@@ -538,6 +505,7 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
+      <!-- UPLOAD CERTS -->
       <div class="section" id="sec-uploadCerts">
         <div class="card" style="margin-bottom:20px;">
           <div class="card-header">
@@ -548,38 +516,17 @@ tr:hover td { background: var(--gray-50); }
             <p style="font-size: 13px; color: var(--gray-500); margin-bottom: 18px;">
               Because images are hosted on GitHub, type the exact filename (e.g. <strong>msword-cert.png</strong>) of the uploaded image below.
             </p>
-
             <div class="form-row">
               <div class="form-group-dash" style="grid-column: 1 / -1;">
                 <label>Certificate File Name (from GitHub) *</label>
                 <input type="text" id="certFileNameInput" placeholder="e.g. msword-cert.png">
               </div>
-              <div class="form-group-dash">
-                <label>Certificate Title *</label>
-                <input type="text" id="certName" placeholder="e.g. Certificate of Completion">
-              </div>
-              <div class="form-group-dash">
-                <label>Course Name *</label>
-                <input type="text" id="certCourse" placeholder="e.g. Microsoft Azure Fundamentals" list="coursesList">
-                <datalist id="coursesList"></datalist>
-              </div>
-              <div class="form-group-dash">
-                <label>Class / Batch *</label>
-                <input type="text" id="certBatch" placeholder="e.g. Batch 2024-A" list="batchesList">
-                <datalist id="batchesList"></datalist>
-              </div>
-              <div class="form-group-dash">
-                <label>Date Issued *</label>
-                <input type="date" id="certDate">
-              </div>
-              <div class="form-group-dash">
-                <label>Issuing Authority</label>
-                <input type="text" id="certAuthority" placeholder="e.g. Microsoft Nigeria">
-              </div>
-              <div class="form-group-dash">
-                <label>Certificate Type</label>
-                <input type="text" id="certType" placeholder="e.g. Certificate of Attendance">
-              </div>
+              <div class="form-group-dash"><label>Certificate Title *</label><input type="text" id="certName" placeholder="e.g. Certificate of Completion"></div>
+              <div class="form-group-dash"><label>Course Name *</label><input type="text" id="certCourse" placeholder="e.g. Microsoft Azure Fundamentals" list="coursesList"><datalist id="coursesList"></datalist></div>
+              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="certBatch" placeholder="e.g. Batch 2024-A" list="batchesList"><datalist id="batchesList"></datalist></div>
+              <div class="form-group-dash"><label>Date Issued *</label><input type="date" id="certDate"></div>
+              <div class="form-group-dash"><label>Issuing Authority</label><input type="text" id="certAuthority" placeholder="e.g. Microsoft Nigeria"></div>
+              <div class="form-group-dash"><label>Certificate Type</label><input type="text" id="certType" placeholder="e.g. Certificate of Attendance"></div>
             </div>
             <button class="btn btn-green" onclick="saveCertificate()">
               <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
@@ -589,6 +536,7 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
+      <!-- STUDENT RECORDS -->
       <div class="section" id="sec-studentRecords">
         <div class="card">
           <div class="card-header" style="flex-wrap:wrap;">
@@ -602,28 +550,12 @@ tr:hover td { background: var(--gray-50); }
           <div class="card-body">
             <div class="filter-bar">
               <input type="text" id="studentSearch" placeholder="Search by name..." oninput="renderStudentTable()" style="flex:1;min-width:160px;">
-              <select id="filterCourse" onchange="renderStudentTable()">
-                <option value="">All Courses</option>
-              </select>
-              <select id="filterBatch" onchange="renderStudentTable()">
-                <option value="">All Batches</option>
-              </select>
+              <select id="filterCourse" onchange="renderStudentTable()"><option value="">All Courses</option></select>
+              <select id="filterBatch" onchange="renderStudentTable()"><option value="">All Batches</option></select>
             </div>
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Full Name</th>
-                    <th>Course</th>
-                    <th>Class/Batch</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Cert Status</th>
-                    <th>Downloads</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>#</th><th>Full Name</th><th>Course</th><th>Class/Batch</th><th>Email</th><th>Phone</th><th>Cert Status</th><th>Downloads</th><th>Action</th></tr></thead>
                 <tbody id="studentTbody"></tbody>
               </table>
             </div>
@@ -631,6 +563,7 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
+      <!-- CERT RECORDS -->
       <div class="section" id="sec-certRecords">
         <div class="card">
           <div class="card-header">
@@ -640,18 +573,7 @@ tr:hover td { background: var(--gray-50); }
           <div class="card-body">
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Preview</th>
-                    <th>Certificate Title</th>
-                    <th>Course</th>
-                    <th>Class/Batch</th>
-                    <th>Date Issued</th>
-                    <th>Eligible Students</th>
-                    <th>Downloads</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Preview</th><th>Certificate Title</th><th>Course</th><th>Class/Batch</th><th>Date Issued</th><th>Eligible Students</th><th>Downloads</th><th>Actions</th></tr></thead>
                 <tbody id="certTbody"></tbody>
               </table>
             </div>
@@ -659,6 +581,7 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
+      <!-- NOTIFICATIONS -->
       <div class="section" id="sec-notifications">
         <div class="card">
           <div class="card-header" style="flex-wrap:wrap;">
@@ -668,59 +591,41 @@ tr:hover td { background: var(--gray-50); }
           <div class="card-body" id="notifList">
             <div class="empty-state">
               <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-              <h4>No Notifications</h4>
-              <p>Student certificate download events will appear here.</p>
+              <h4>No Notifications</h4><p>Student certificate download events will appear here.</p>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- SETTINGS -->
       <div class="section" id="sec-settings">
         <div class="card" style="max-width:540px; margin-bottom:20px;">
-          <div class="card-header">
-            <h3>Change Admin Credentials</h3>
-          </div>
+          <div class="card-header"><h3>Change Admin Credentials</h3></div>
           <div class="card-body">
-            <div class="form-group-dash">
-              <label>New Username / Email</label>
-              <input type="text" id="newUsername" placeholder="Enter new username or email">
-            </div>
-            
+            <div class="form-group-dash"><label>New Username / Email</label><input type="text" id="newUsername" placeholder="Enter new username or email"></div>
             <div class="form-group-dash">
               <label>Current Password</label>
               <input type="password" id="currentPass" class="pwd-input-field" placeholder="Enter current password">
-              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('currentPass', this)" title="Show Password">
-                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-              </button>
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('currentPass', this)"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
             </div>
-            
             <div class="form-group-dash">
               <label>New Password</label>
               <input type="password" id="newPass" class="pwd-input-field" placeholder="Enter new password">
-              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPass', this)" title="Show Password">
-                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-              </button>
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPass', this)"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
             </div>
-            
             <div class="form-group-dash">
               <label>Confirm New Password</label>
               <input type="password" id="confirmPass" class="pwd-input-field" placeholder="Repeat new password">
-              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPass', this)" title="Show Password">
-                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-              </button>
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPass', this)"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
             </div>
-
             <button class="btn btn-green" onclick="changeCredentials()">
               <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
               Save Changes
             </button>
           </div>
         </div>
-
         <div class="card" style="max-width:540px; border:1px solid var(--error-border);">
-          <div class="card-header">
-            <h3 style="color:var(--error)">Danger Zone</h3>
-          </div>
+          <div class="card-header"><h3 style="color:var(--error)">Danger Zone</h3></div>
           <div class="card-body">
             <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">This will permanently delete all students, certificates, and notification records. This action cannot be undone.</p>
             <button class="btn btn-danger" onclick="resetAllData()">
@@ -731,7 +636,11 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-    </div></div></div><div id="modalOverlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+    </div>
+  </div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="modalBox">
     <div class="modal-header">
       <h3 id="modalTitle">Preview Certificate</h3>
@@ -744,7 +653,7 @@ tr:hover td { background: var(--gray-50); }
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ===================== DATABASE CONFIG =====================
+// ===================== CONFIG =====================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDW7ODHwsLUleRQOBndTVT_toClQnLytv5DHQzwF4ZIUOjwi5l12mnDIeDpnUteb-8/exec';
 
 function showLoader() { document.getElementById('globalLoader').style.display = 'flex'; }
@@ -753,11 +662,9 @@ function hideLoader() { document.getElementById('globalLoader').style.display = 
 async function fetchSheet(sheetName) {
   try {
     const res = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
-    return await res.json();
-  } catch(e) {
-    console.error("Database fetch error:", e);
-    return [];
-  }
+    const json = await res.json();
+    return Array.isArray(json) ? json : [];
+  } catch(e) { console.error('DB fetch error:', e); return []; }
 }
 
 async function saveSheet(sheetName, data) {
@@ -765,37 +672,46 @@ async function saveSheet(sheetName, data) {
     await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ sheet: sheetName, data: data }),
+      body: JSON.stringify({ sheet: sheetName, data }),
       redirect: 'follow'
     });
-  } catch(e) {
-    console.error("Database save error:", e);
-  }
+  } catch(e) { console.error('DB save error:', e); }
 }
 
-// Cached Data
-let gStudents = [];
-let gCerts = [];
-let gNotifs = [];
+let gStudents = [], gCerts = [], gNotifs = [];
+let pendingImport = [];
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
-// ===================== PASSWORD REVEAL =====================
+// ===================== HELPERS =====================
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+// ===================== PASSWORD TOGGLE =====================
 function togglePasswordVisibility(inputId, btn) {
   const input = document.getElementById(inputId);
   const icon = btn.querySelector('svg');
   if (input.type === 'password') {
     input.type = 'text';
     icon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
-    btn.title = "Hide Password";
+    btn.title = 'Hide Password';
   } else {
     input.type = 'password';
     icon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
-    btn.title = "Show Password";
+    btn.title = 'Show Password';
   }
 }
-
-// ===================== STATE =====================
-let pendingImport = [];
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
 // ===================== TOAST =====================
 function showToast(message, type = 'info', duration = 3500) {
@@ -803,13 +719,16 @@ function showToast(message, type = 'info', duration = 3500) {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   const icons = {
-    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
     error: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
     info: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`
   };
   toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
   container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(20px)'; toast.style.transition='all 0.3s'; setTimeout(() => toast.remove(), 300); }, duration);
+  setTimeout(() => {
+    toast.style.cssText += 'opacity:0;transform:translateX(20px);transition:all 0.3s;';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
 }
 
 // ===================== MOBILE SIDEBAR =====================
@@ -826,20 +745,19 @@ function closeSidebar() {
 async function doLogin() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
-  
+  if (!user || !pass) { document.getElementById('loginError').classList.add('show'); return; }
   showLoader();
-  
+
   let credsList = await fetchSheet('Credentials');
   if (!credsList || credsList.length === 0) {
     credsList = [
-      { username: "microsoftportharcourt@gmail.com", password: "spring2019" },
-      { username: "adielasam2015@gmail.com", password: "123456" }
+      { username: 'microsoftportharcourt@gmail.com', password: 'spring2019' },
+      { username: 'adielasam2015@gmail.com', password: '123456' }
     ];
     await saveSheet('Credentials', credsList);
   }
 
   const validUser = credsList.find(c => c.username === user && c.password === pass);
-
   if (validUser) {
     sessionStorage.setItem('mia_session', JSON.stringify({ username: user, loginAt: Date.now() }));
     document.getElementById('loginPage').style.display = 'none';
@@ -866,28 +784,24 @@ document.getElementById('loginUser').addEventListener('keydown', e => { if (e.ke
 
 // ===================== INIT =====================
 async function initDashboard(username) {
-  const initials = username.substring(0, 2).toUpperCase();
-  document.getElementById('adminAvatar').textContent = initials;
+  document.getElementById('adminAvatar').textContent = username.substring(0, 2).toUpperCase();
   document.getElementById('adminName').textContent = username;
   document.getElementById('newUsername').value = username;
-  
+  initDropZone();
   await refreshDashboard();
   hideLoader();
 }
 
 async function refreshDashboard() {
   showLoader();
-  
   gStudents = await fetchSheet('Students');
   gCerts = await fetchSheet('Certificates');
   gNotifs = await fetchSheet('Notifications');
-  
-  const downloads = gNotifs.length;
-  const unread = gNotifs.filter(n => !n.read).length;
 
+  const unread = gNotifs.filter(n => !n.read).length;
   document.getElementById('statStudents').textContent = gStudents.length;
   document.getElementById('statCerts').textContent = gCerts.length;
-  document.getElementById('statDownloads').textContent = downloads;
+  document.getElementById('statDownloads').textContent = gNotifs.length;
   document.getElementById('statUnread').textContent = unread;
 
   const badge = document.getElementById('notifBadge');
@@ -896,7 +810,7 @@ async function refreshDashboard() {
 
   const feed = document.getElementById('activityFeed');
   const recent = gNotifs.slice(0, 10);
-  if (recent.length === 0) {
+  if (!recent.length) {
     feed.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><h4>No Activity Yet</h4><p>Student downloads appear here.</p></div>`;
   } else {
     feed.innerHTML = `<div class="activity-feed">${recent.map(n => `
@@ -907,10 +821,9 @@ async function refreshDashboard() {
           <div class="activity-meta">${escHtml(n.course)} · ${escHtml(n.classBatch || '')}</div>
         </div>
         <div class="activity-time">${timeAgo(n.timestamp)}</div>
-      </div>`).join('')}
-    </div>`;
+      </div>`).join('')}</div>`;
   }
-  
+
   populateCoursesBatches();
   hideLoader();
 }
@@ -922,7 +835,7 @@ function populateCoursesBatches() {
   document.getElementById('batchesList').innerHTML = batches.map(b => `<option value="${escHtml(b)}">`).join('');
 }
 
-// ===================== SECTION NAVIGATION =====================
+// ===================== NAV =====================
 const sectionMeta = {
   dashboard: { title: 'Dashboard', sub: 'Overview of all activity' },
   uploadStudents: { title: 'Upload Students', sub: 'Import student records via Excel or manually' },
@@ -938,13 +851,10 @@ async function showSection(name, btn) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
-
   const meta = sectionMeta[name] || {};
   document.getElementById('pageTitle').textContent = meta.title || name;
   document.getElementById('pageSub').textContent = meta.sub || '';
-
   if (window.innerWidth <= 900) closeSidebar();
-
   if (name === 'dashboard') await refreshDashboard();
   if (name === 'studentRecords') { renderStudentTable(); populateStudentFilters(); }
   if (name === 'certRecords') renderCertTable();
@@ -952,67 +862,125 @@ async function showSection(name, btn) {
   if (name === 'uploadCerts') populateCoursesBatches();
 }
 
-// ===================== STUDENT UPLOAD =====================
+// ===================== DROP ZONE SETUP =====================
+// FIX #4: Properly wire all drag events so drop actually works.
+function initDropZone() {
+  const zone = document.getElementById('studentDropZone');
+  if (!zone) return;
+
+  zone.addEventListener('dragenter', e => { e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragover',  e => { e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', e => { e.preventDefault(); e.stopPropagation(); zone.classList.remove('drag-over'); });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleStudentFile(file);
+  });
+}
+
+// ===================== FILE UPLOAD — FIXED CORE =====================
+function setUploadStatus(type, msg) {
+  const el = document.getElementById('uploadStatus');
+  el.className = `upload-status show ${type}`;
+  el.innerHTML = msg;
+}
+function clearUploadStatus() {
+  const el = document.getElementById('uploadStatus');
+  el.className = 'upload-status';
+  el.innerHTML = '';
+}
+
 function handleStudentFile(file) {
   if (!file) return;
+
+  // FIX #5: Validate extension up front with a clear error
   const ext = file.name.split('.').pop().toLowerCase();
-  
-  if (!['xlsx', 'xls', 'csv'].includes(ext)) { 
-    showToast('Please upload an Excel or CSV file (.xlsx, .xls, .csv)', 'error'); 
-    return; 
+  if (!['xlsx', 'xls', 'csv'].includes(ext)) {
+    setUploadStatus('err', `❌ Unsupported file type ".${ext}". Please upload .xlsx, .xls, or .csv`);
+    return;
   }
 
+  // FIX #6: Check XLSX library loaded — guards against CDN timing issues
+  if (typeof XLSX === 'undefined') {
+    setUploadStatus('err', '❌ Spreadsheet library not loaded yet. Please wait a moment and try again.');
+    return;
+  }
+
+  setUploadStatus('processing', '⏳ Reading file, please wait…');
+  document.getElementById('importPreview').style.display = 'none';
+
   const reader = new FileReader();
+  reader.onerror = () => {
+    setUploadStatus('err', '❌ Could not read the file. It may be corrupted or locked by another program.');
+  };
+
   reader.onload = e => {
     try {
+      // FIX #7: Parse the workbook from ArrayBuffer (works for all: xlsx, xls, csv)
       const data = new Uint8Array(e.target.result);
-      const wb = XLSX.read(data, { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-
-      if (!rows || rows.length < 2) { 
-        showToast('File appears empty or has no data rows.', 'error'); 
-        return; 
-      }
-
-      // Clean headers from invisible BOM characters often present in CSVs
-      const headers = rows[0].map(h => String(h).replace(/^\uFEFF/, '').toLowerCase().trim());
-      const colMap = {};
-      
-      headers.forEach((h, i) => {
-        if (h.includes('full') || h === 'name') colMap.fullName = i;
-        if (h === 'course') colMap.course = i;
-        
-        // Intelligent fallback for mapping "Class" and "Batch" if they are separate columns
-        if (h.includes('batch')) colMap.batch = i;
-        if (h.includes('class')) colMap.class = i;
-        
-        if (h.includes('email')) colMap.email = i;
-        if (h.includes('phone') || h.includes('tel')) colMap.phone = i;
+      const wb = XLSX.read(data, {
+        type: 'array',
+        cellDates: true,   // parse date cells properly
+        raw: false         // format numbers/dates as strings for display
       });
 
-      // Prefer "Batch" column for the classBatch value if both Class and Batch exist (specific to your CSV format)
-      if (colMap.batch !== undefined) colMap.classBatch = colMap.batch;
-      else if (colMap.class !== undefined) colMap.classBatch = colMap.class;
+      if (!wb.SheetNames || wb.SheetNames.length === 0) {
+        setUploadStatus('err', '❌ The file has no sheets. Please check the file and try again.');
+        return;
+      }
 
-      // Fallbacks just in case headers don't match
-      if (colMap.fullName === undefined) colMap.fullName = 0;
-      if (colMap.course === undefined) colMap.course = 1;
-      if (colMap.classBatch === undefined) colMap.classBatch = 2;
-      if (colMap.email === undefined) colMap.email = 3;
-      if (colMap.phone === undefined) colMap.phone = 4;
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      // Use defval:'' so empty cells don't become undefined
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
 
-      pendingImport = rows.slice(1).filter(r => r[colMap.fullName]).map(r => ({
-        fullName: String(r[colMap.fullName] || '').trim(),
-        course: String(r[colMap.course] || '').trim(),
-        classBatch: String(r[colMap.classBatch] || '').trim(),
-        email: String(r[colMap.email] || '').trim(),
-        phone: String(r[colMap.phone] || '').trim()
-      })).filter(s => s.fullName);
+      if (!rows || rows.length < 2) {
+        setUploadStatus('err', '❌ The file appears empty or only has a header row with no data underneath.');
+        return;
+      }
 
+      // FIX #8: Robust header mapping — strips BOM, trims whitespace, normalises to lowercase
+      const rawHeaders = rows[0].map(h => String(h).replace(/^\uFEFF/, '').toLowerCase().trim());
+
+      // Build a flexible column map by scanning for keywords
+      const colMap = { fullName: -1, course: -1, classBatch: -1, email: -1, phone: -1 };
+
+      rawHeaders.forEach((h, i) => {
+        if (colMap.fullName < 0  && (h.includes('full') || h === 'name' || h === 'fullname' || h === 'student name' || h === 'studentname')) colMap.fullName = i;
+        if (colMap.course < 0   && h.includes('course')) colMap.course = i;
+        if (colMap.classBatch < 0 && (h.includes('batch') || h.includes('class'))) colMap.classBatch = i;
+        if (colMap.email < 0    && h.includes('email')) colMap.email = i;
+        if (colMap.phone < 0    && (h.includes('phone') || h.includes('tel') || h.includes('mobile'))) colMap.phone = i;
+      });
+
+      // Fall back to positional columns if headers weren't recognised at all
+      if (colMap.fullName  < 0) colMap.fullName  = 0;
+      if (colMap.course    < 0) colMap.course    = 1;
+      if (colMap.classBatch< 0) colMap.classBatch= 2;
+      if (colMap.email     < 0) colMap.email     = 3;
+      if (colMap.phone     < 0) colMap.phone     = 4;
+
+      // FIX #9: Parse data rows, skipping the header and any fully empty rows
+      pendingImport = rows.slice(1)
+        .filter(r => Array.isArray(r) && r.some(cell => String(cell).trim() !== ''))
+        .map(r => ({
+          fullName:   String(r[colMap.fullName]   || '').trim(),
+          course:     String(r[colMap.course]     || '').trim(),
+          classBatch: String(r[colMap.classBatch] || '').trim(),
+          email:      String(r[colMap.email]      || '').trim(),
+          phone:      String(r[colMap.phone]      || '').trim()
+        }))
+        .filter(s => s.fullName !== ''); // only keep rows that have a name
+
+      if (pendingImport.length === 0) {
+        setUploadStatus('err', `❌ No valid student rows found. Make sure the "Full Name" column is not empty.`);
+        return;
+      }
+
+      // Render preview table
       document.getElementById('previewCount').textContent = pendingImport.length;
-      const tbody = document.getElementById('previewTbody');
-      tbody.innerHTML = pendingImport.map((s, i) => `
+      document.getElementById('previewTbody').innerHTML = pendingImport.map((s, i) => `
         <tr>
           <td>${i + 1}</td>
           <td>${escHtml(s.fullName)}</td>
@@ -1023,28 +991,39 @@ function handleStudentFile(file) {
         </tr>`).join('');
 
       document.getElementById('importPreview').style.display = 'block';
+      setUploadStatus('ready', `✅ ${pendingImport.length} student${pendingImport.length !== 1 ? 's' : ''} ready to import. Review below and click "Confirm Import".`);
+
     } catch (err) {
-      console.error(err);
-      showToast('Failed to parse file. Please check the format.', 'error');
+      // FIX #10: Show the actual error message instead of a generic "check format"
+      console.error('XLSX parse error:', err);
+      setUploadStatus('err', `❌ Parse failed: ${err.message || err}. Try re-saving the file as .xlsx in Excel or Google Sheets and upload again.`);
     }
   };
-  // Read as ArrayBuffer ensures seamless parsing of all Excel types and CSV encodings
+
+  // readAsArrayBuffer is correct and needed for SheetJS to handle all formats
   reader.readAsArrayBuffer(file);
 }
 
+// ===================== CONFIRM IMPORT — FIXED COUNT BUG =====================
 async function confirmImport() {
   if (!pendingImport.length) return;
   showLoader();
-  
-  const all = [...gStudents, ...pendingImport.map(s => ({ ...s, id: uid(), downloadCount: 0 }))];
-  await saveSheet('Students', all);
-  gStudents = all;
-  
+
+  const importedCount = pendingImport.length; // capture before clearing
+  // FIX #11: Build the new combined array; add unique IDs and default downloadCount
+  const newStudents = pendingImport.map(s => ({ ...s, id: uid(), downloadCount: 0 }));
+  const combined = [...gStudents, ...newStudents];
+
+  await saveSheet('Students', combined);
+  gStudents = combined;
+
   document.getElementById('importPreview').style.display = 'none';
   document.getElementById('studentFileInput').value = '';
+  clearUploadStatus();
   pendingImport = [];
-  
-  showToast(`${all.length - gStudents.length + pendingImport.length} students imported!`, 'success');
+
+  // FIX #12: Use the captured count — no more double-counting arithmetic
+  showToast(`${importedCount} student${importedCount !== 1 ? 's' : ''} imported successfully!`, 'success');
   await refreshDashboard();
   hideLoader();
 }
@@ -1053,31 +1032,26 @@ function cancelImport() {
   pendingImport = [];
   document.getElementById('importPreview').style.display = 'none';
   document.getElementById('studentFileInput').value = '';
+  clearUploadStatus();
 }
 
+// ===================== MANUAL ADD =====================
 async function addStudentManually() {
-  const fullName = document.getElementById('manFullName').value.trim();
-  const course = document.getElementById('manCourse').value.trim();
+  const fullName   = document.getElementById('manFullName').value.trim();
+  const course     = document.getElementById('manCourse').value.trim();
   const classBatch = document.getElementById('manBatch').value.trim();
-  const email = document.getElementById('manEmail').value.trim();
-  const phone = document.getElementById('manPhone').value.trim();
+  const email      = document.getElementById('manEmail').value.trim();
+  const phone      = document.getElementById('manPhone').value.trim();
 
   if (!fullName || !course || !classBatch) { showToast('Full Name, Course, and Class/Batch are required.', 'error'); return; }
-
   const exists = gStudents.find(s => s.fullName.toLowerCase() === fullName.toLowerCase());
   if (exists) { showToast('A student with this name already exists.', 'error'); return; }
 
   showLoader();
   gStudents.push({ id: uid(), fullName, course, classBatch, email, phone, downloadCount: 0 });
   await saveSheet('Students', gStudents);
-  
-  document.getElementById('manFullName').value = '';
-  document.getElementById('manCourse').value = '';
-  document.getElementById('manBatch').value = '';
-  document.getElementById('manEmail').value = '';
-  document.getElementById('manPhone').value = '';
+  ['manFullName','manCourse','manBatch','manEmail','manPhone'].forEach(id => document.getElementById(id).value = '');
   showToast(`Student "${fullName}" added successfully!`, 'success');
-  
   await refreshDashboard();
   hideLoader();
 }
@@ -1086,7 +1060,6 @@ async function deleteStudent(id) {
   const s = gStudents.find(x => x.id === id);
   if (!s) return;
   if (!confirm(`Delete student "${s.fullName}"? This cannot be undone.`)) return;
-  
   showLoader();
   gStudents = gStudents.filter(x => x.id !== id);
   await saveSheet('Students', gStudents);
@@ -1098,14 +1071,14 @@ async function deleteStudent(id) {
 
 // ===================== STUDENT TABLE =====================
 function renderStudentTable() {
-  const search = (document.getElementById('studentSearch').value || '').toLowerCase();
-  const filterCourse = document.getElementById('filterCourse').value;
+  const search      = (document.getElementById('studentSearch').value || '').toLowerCase();
+  const filterCourse= document.getElementById('filterCourse').value;
   const filterBatch = document.getElementById('filterBatch').value;
 
-  let filtered = gStudents.filter(s => {
+  const filtered = gStudents.filter(s => {
     const matchSearch = !search || s.fullName.toLowerCase().includes(search) || (s.course || '').toLowerCase().includes(search);
     const matchCourse = !filterCourse || s.course === filterCourse;
-    const matchBatch = !filterBatch || s.classBatch === filterBatch;
+    const matchBatch  = !filterBatch  || s.classBatch === filterBatch;
     return matchSearch && matchCourse && matchBatch;
   });
 
@@ -1122,8 +1095,7 @@ function renderStudentTable() {
       c.course.toLowerCase() === (s.course || '').toLowerCase() &&
       c.classBatch.toLowerCase() === (s.classBatch || '').toLowerCase()
     );
-    return `
-    <tr>
+    return `<tr>
       <td>${i + 1}</td>
       <td><strong>${escHtml(s.fullName)}</strong></td>
       <td>${escHtml(s.course || '—')}</td>
@@ -1140,65 +1112,44 @@ function renderStudentTable() {
 function populateStudentFilters() {
   const courses = [...new Set(gStudents.map(s => s.course).filter(Boolean))];
   const batches = [...new Set(gStudents.map(s => s.classBatch).filter(Boolean))];
-
-  const courseFilter = document.getElementById('filterCourse');
-  const batchFilter = document.getElementById('filterBatch');
-  const currentCourse = courseFilter.value;
-  const currentBatch = batchFilter.value;
-
-  courseFilter.innerHTML = '<option value="">All Courses</option>' + courses.map(c => `<option value="${escHtml(c)}" ${c===currentCourse?'selected':''}>${escHtml(c)}</option>`).join('');
-  batchFilter.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escHtml(b)}" ${b===currentBatch?'selected':''}>${escHtml(b)}</option>`).join('');
+  const cf = document.getElementById('filterCourse');
+  const bf = document.getElementById('filterBatch');
+  const cc = cf.value, cb = bf.value;
+  cf.innerHTML = '<option value="">All Courses</option>' + courses.map(c => `<option value="${escHtml(c)}" ${c===cc?'selected':''}>${escHtml(c)}</option>`).join('');
+  bf.innerHTML = '<option value="">All Batches</option>'  + batches.map(b => `<option value="${escHtml(b)}" ${b===cb?'selected':''}>${escHtml(b)}</option>`).join('');
 }
 
 function exportStudentsCSV() {
   if (!gStudents.length) { showToast('No students to export.', 'error'); return; }
-  const headers = ['Full Name', 'Course', 'Class/Batch', 'Email', 'Phone', 'Downloads'];
+  const headers = ['Full Name','Course','Class/Batch','Email','Phone','Downloads'];
   const rows = gStudents.map(s => [s.fullName, s.course, s.classBatch, s.email, s.phone, s.downloadCount || 0]);
-  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'students.csv'; a.click();
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'students.csv';
+  a.click();
   showToast('Students exported to CSV.', 'success');
 }
 
-// ===================== CERTIFICATE CONFIGURATION =====================
+// ===================== CERTIFICATE SAVE =====================
 async function saveCertificate() {
   const certFileNameInput = document.getElementById('certFileNameInput').value.trim();
-  const certName = document.getElementById('certName').value.trim();
-  const certCourse = document.getElementById('certCourse').value.trim();
-  const certBatch = document.getElementById('certBatch').value.trim();
-  const certDate = document.getElementById('certDate').value;
-  const certAuthority = document.getElementById('certAuthority').value.trim();
-  const certTypeVal = document.getElementById('certType').value.trim();
+  const certName          = document.getElementById('certName').value.trim();
+  const certCourse        = document.getElementById('certCourse').value.trim();
+  const certBatch         = document.getElementById('certBatch').value.trim();
+  const certDate          = document.getElementById('certDate').value;
+  const certAuthority     = document.getElementById('certAuthority').value.trim();
+  const certTypeVal       = document.getElementById('certType').value.trim();
 
-  if (!certFileNameInput || !certName || !certCourse || !certBatch || !certDate) { 
-    showToast('Please fill all required fields (*).', 'error'); return; 
+  if (!certFileNameInput || !certName || !certCourse || !certBatch || !certDate) {
+    showToast('Please fill all required fields (*).', 'error'); return;
   }
 
   showLoader();
-  gCerts.push({
-    id: uid(),
-    certName,
-    course: certCourse,
-    classBatch: certBatch,
-    dateIssued: certDate,
-    issuingAuthority: certAuthority,
-    certType: certTypeVal,
-    fileData: certFileNameInput,
-    fileType: 'image',
-    fileName: certFileNameInput,
-    uploadedAt: new Date().toISOString()
-  });
-  
+  gCerts.push({ id: uid(), certName, course: certCourse, classBatch: certBatch, dateIssued: certDate, issuingAuthority: certAuthority, certType: certTypeVal, fileData: certFileNameInput, fileType: 'image', fileName: certFileNameInput, uploadedAt: new Date().toISOString() });
   await saveSheet('Certificates', gCerts);
-  
-  document.getElementById('certFileNameInput').value = '';
-  document.getElementById('certName').value = '';
-  document.getElementById('certCourse').value = '';
-  document.getElementById('certBatch').value = '';
-  document.getElementById('certDate').value = '';
-  document.getElementById('certAuthority').value = '';
-  document.getElementById('certType').value = '';
-  
+
+  ['certFileNameInput','certName','certCourse','certBatch','certDate','certAuthority','certType'].forEach(id => document.getElementById(id).value = '');
   showToast(`Certificate "${certName}" registered!`, 'success');
   await refreshDashboard();
   hideLoader();
@@ -1208,26 +1159,18 @@ async function saveCertificate() {
 function renderCertTable() {
   document.getElementById('certCountBadge').textContent = gCerts.length;
   const tbody = document.getElementById('certTbody');
-
   if (!gCerts.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state" style="padding:32px"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg><h4>No Certificates</h4><p>Register certificate templates above.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state" style="padding:32px"><h4>No Certificates</h4><p>Register certificate templates above.</p></div></td></tr>`;
     return;
   }
-
   tbody.innerHTML = gCerts.map(c => {
-    const eligible = gStudents.filter(s =>
-      (s.course || '').toLowerCase() === c.course.toLowerCase() &&
-      (s.classBatch || '').toLowerCase() === c.classBatch.toLowerCase()
-    ).length;
+    const eligible  = gStudents.filter(s => (s.course||'').toLowerCase() === c.course.toLowerCase() && (s.classBatch||'').toLowerCase() === c.classBatch.toLowerCase()).length;
     const downloads = gNotifs.filter(n => n.certName === c.certName && n.course === c.course).length;
-    const date = c.dateIssued ? new Date(c.dateIssued).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-
+    const date      = c.dateIssued ? new Date(c.dateIssued).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
     const thumbHtml = c.fileType === 'image'
       ? `<div class="cert-thumb"><img src="${c.fileData}" alt="cert" onerror="this.src=''; this.alt='X'"></div>`
       : `<div class="cert-thumb cert-thumb-pdf" style="display:flex;align-items:center;justify-content:center;width:80px;height:54px;border-radius:6px;border:1px solid var(--error-border);">PDF</div>`;
-
-    return `
-    <tr>
+    return `<tr>
       <td>${thumbHtml}</td>
       <td><strong>${escHtml(c.certName)}</strong></td>
       <td>${escHtml(c.course)}</td>
@@ -1235,12 +1178,10 @@ function renderCertTable() {
       <td>${date}</td>
       <td><span class="badge badge-blue">${eligible}</span></td>
       <td><span class="badge badge-green">${downloads}</span></td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-outline btn-xs" onclick="previewCert('${c.id}')">Preview</button>
-          <button class="btn btn-danger btn-xs" onclick="deleteCert('${c.id}')">Delete</button>
-        </div>
-      </td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-xs" onclick="previewCert('${c.id}')">Preview</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteCert('${c.id}')">Delete</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -1249,27 +1190,16 @@ function previewCert(id) {
   const cert = gCerts.find(c => c.id === id);
   if (!cert) return;
   document.getElementById('modalTitle').textContent = cert.certName;
-  if (cert.fileType === 'image') {
-    document.getElementById('modalBody').innerHTML = `<img src="${cert.fileData}" style="width:100%;border-radius:8px;display:block;" onerror="this.outerHTML='<p style=\\'color:red;\\'>Image could not be loaded. Ensure the filename is correct and hosted properly.</p>'">`;
-  } else {
-    document.getElementById('modalBody').innerHTML = `
-      <div style="text-align:center;padding:24px;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--error)"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7H20.5v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
-        <p style="margin-top:12px;font-size:14px;color:var(--gray-600);">PDF Certificate: <strong>${escHtml(cert.fileName)}</strong></p>
-        <a href="${cert.fileData}" download="${escHtml(cert.fileName)}" class="btn btn-green" style="margin-top:16px;text-decoration:none;">
-          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-          Download PDF
-        </a>
-      </div>`;
-  }
+  document.getElementById('modalBody').innerHTML = cert.fileType === 'image'
+    ? `<img src="${cert.fileData}" style="width:100%;border-radius:8px;display:block;" onerror="this.outerHTML='<p style=\\'color:red;\\'>Image could not load. Check the filename is correct and hosted on GitHub.</p>'">`
+    : `<div style="text-align:center;padding:24px;"><p style="font-size:14px;color:var(--gray-600);">PDF: <strong>${escHtml(cert.fileName)}</strong></p><a href="${cert.fileData}" download="${escHtml(cert.fileName)}" class="btn btn-green" style="margin-top:16px;text-decoration:none;">Download PDF</a></div>`;
   document.getElementById('modalOverlay').style.display = 'flex';
 }
 
 async function deleteCert(id) {
   const cert = gCerts.find(c => c.id === id);
   if (!cert) return;
-  if (!confirm(`Delete certificate "${cert.certName}"? Students linked to this course/batch will no longer be able to download.`)) return;
-  
+  if (!confirm(`Delete certificate "${cert.certName}"?`)) return;
   showLoader();
   gCerts = gCerts.filter(c => c.id !== id);
   await saveSheet('Certificates', gCerts);
@@ -1282,12 +1212,10 @@ async function deleteCert(id) {
 // ===================== NOTIFICATIONS =====================
 function renderNotifications() {
   const list = document.getElementById('notifList');
-
   if (!gNotifs.length) {
     list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><h4>No Notifications</h4><p>Student downloads will appear here.</p></div>`;
     return;
   }
-
   list.innerHTML = gNotifs.map(n => `
     <div class="notif-item${n.read ? '' : ' unread'}">
       ${!n.read ? '<div class="notif-dot"></div>' : '<div style="width:8px;height:8px;flex-shrink:0;"></div>'}
@@ -1311,47 +1239,39 @@ async function markAllRead() {
 
 // ===================== SETTINGS =====================
 async function changeCredentials() {
-  const newUser = document.getElementById('newUsername').value.trim();
+  const newUser     = document.getElementById('newUsername').value.trim();
   const currentPass = document.getElementById('currentPass').value;
-  const newPass = document.getElementById('newPass').value;
+  const newPass     = document.getElementById('newPass').value;
   const confirmPass = document.getElementById('confirmPass').value;
 
   showLoader();
   const credsList = await fetchSheet('Credentials');
-  const session = JSON.parse(sessionStorage.getItem('mia_session'));
+  const session   = JSON.parse(sessionStorage.getItem('mia_session'));
   const userIndex = credsList.findIndex(c => c.username === session.username);
-  
-  if (userIndex === -1) { hideLoader(); return; }
-  const currentUser = credsList[userIndex];
 
-  if (currentPass !== currentUser.password) { hideLoader(); showToast('Current password is incorrect.', 'error'); return; }
-  if (!newUser) { hideLoader(); showToast('Username cannot be empty.', 'error'); return; }
+  if (userIndex === -1) { hideLoader(); showToast('Session error. Please re-login.', 'error'); return; }
+  if (currentPass !== credsList[userIndex].password) { hideLoader(); showToast('Current password is incorrect.', 'error'); return; }
+  if (!newUser)  { hideLoader(); showToast('Username cannot be empty.', 'error'); return; }
   if (newPass && newPass !== confirmPass) { hideLoader(); showToast('New passwords do not match.', 'error'); return; }
 
-  credsList[userIndex] = { username: newUser, password: newPass || currentUser.password };
+  credsList[userIndex] = { username: newUser, password: newPass || credsList[userIndex].password };
   await saveSheet('Credentials', credsList);
-
   session.username = newUser;
   sessionStorage.setItem('mia_session', JSON.stringify(session));
-
   document.getElementById('adminName').textContent = newUser;
   document.getElementById('adminAvatar').textContent = newUser.substring(0, 2).toUpperCase();
-  document.getElementById('currentPass').value = '';
-  document.getElementById('newPass').value = '';
-  document.getElementById('confirmPass').value = '';
+  ['currentPass','newPass','confirmPass'].forEach(id => document.getElementById(id).value = '');
   hideLoader();
   showToast('Credentials updated successfully!', 'success');
 }
 
 async function resetAllData() {
   if (!confirm('Are you absolutely sure? This will permanently delete ALL students, certificates, and notifications.')) return;
-  if (!confirm('FINAL WARNING: Click OK to permanently erase all data. This cannot be undone.')) return;
-  
+  if (!confirm('FINAL WARNING: Click OK to permanently erase all data.')) return;
   showLoader();
   await saveSheet('Students', []);
   await saveSheet('Certificates', []);
   await saveSheet('Notifications', []);
-  
   await refreshDashboard();
   renderStudentTable();
   renderCertTable();
@@ -1366,8 +1286,8 @@ function closeModal(e) {
   }
 }
 
-// ===================== AUTO-LOGIN CHECK =====================
-(async function () {
+// ===================== AUTO-LOGIN =====================
+(async function() {
   const session = sessionStorage.getItem('mia_session');
   if (session) {
     try {
@@ -1375,11 +1295,8 @@ function closeModal(e) {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('dashboardPage').style.display = 'block';
       await initDashboard(s.username);
-    } catch (e) {
-      sessionStorage.removeItem('mia_session');
-    }
+    } catch(e) { sessionStorage.removeItem('mia_session'); }
   }
-  
   document.querySelectorAll('.logo-img-wrap img').forEach(img => {
     if (!img.complete || img.naturalWidth === 0) {
       img.style.display = 'none';
