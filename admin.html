@@ -3,559 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microsoft Imagine Academy — Certificate Portal</title>
+<title>Microsoft Imagine Academy — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --ms-green: #107C10;
-    --ms-green-dark: #0a5a0a;
-    --ms-green-light: #16a016;
-    --ms-green-pale: #e8f5e8;
-    --white: #ffffff;
-    --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-400: #94a3b8;
-    --gray-600: #475569;
-    --gray-800: #1e293b;
-    --error: #dc2626;
-    --error-bg: #fef2f2;
-    --error-border: #fecaca;
-    --warning: #d97706;
-    --warning-bg: #fffbeb;
-    --info: #0369a1;
-    --info-bg: #eff6ff;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.07);
-    --shadow-lg: 0 10px 40px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08);
-    --radius: 16px;
-    --radius-sm: 10px;
-  }
+:root {
+  --ms-green: #107C10;
+  --ms-green-dark: #0a5a0a;
+  --ms-green-light: #16a016;
+  --ms-green-pale: #e8f5e8;
+  --ms-green-mid: #1a8f1a;
+  --white: #ffffff;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-150: #edf2f7;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --error: #dc2626;
+  --error-bg: #fef2f2;
+  --error-border: #fecaca;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  --info: #0369a1;
+  --info-bg: #eff6ff;
+  --sidebar-w: 256px;
+  --topbar-h: 64px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.14);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
 
-  html, body {
-    height: 100%;
-    font-family: 'Outfit', 'Segoe UI', sans-serif;
-    background: var(--gray-100);
-  }
+html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; background: var(--gray-100); color: var(--gray-800); }
 
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 16px;
-  }
+#globalLoader {
+  display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 99999; 
+  align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(2px);
+}
+.loader-circle {
+  width: 48px; height: 48px; border: 4px solid var(--ms-green-pale); border-top-color: var(--ms-green);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-text { margin-top: 16px; font-size: 14px; font-weight: 700; color: var(--ms-green-dark); }
 
-  .portal-wrapper {
-    display: flex;
-    width: 100%;
-    max-width: 1000px;
-    min-height: 600px;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    animation: fadeUp 0.6s ease both;
-  }
+.logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; position: relative; z-index: 1; }
+.logo-img-wrap { width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; flex-shrink: 0; }
+.logo-img-wrap img { width: 40px; height: 40px; object-fit: contain; }
+.logo-fallback { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+.ms-squares { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 28px; height: 28px; }
+.ms-sq { border-radius: 2px; }
+.ms-sq:nth-child(1) { background: #f25022; }
+.ms-sq:nth-child(2) { background: #7fba00; }
+.ms-sq:nth-child(3) { background: #00a4ef; }
+.ms-sq:nth-child(4) { background: #ffb900; }
+.brand-text h1 { font-size: 15px; font-weight: 700; color: white; line-height: 1.2; margin: 0; }
+.brand-text span { font-size: 11px; color: rgba(255,255,255,0.7); }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+#loginPage { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+.login-wrapper { display: flex; width: 100%; max-width: 880px; min-height: 520px; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-lg); animation: fadeUp 0.5s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.login-left { width: 340px; min-width: 280px; background: var(--ms-green); color: white; padding: 44px 32px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.login-left::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15), transparent 50%); pointer-events: none; }
+.dot-grid { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; }
+.login-left h2 { font-size: 24px; font-weight: 800; color: white; margin-bottom: 8px; position: relative; z-index: 1; }
+.login-left p { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.6; position: relative; z-index: 1; }
+.login-left-footer { margin-top: auto; position: relative; z-index: 1; }
+.login-left-footer p { font-size: 11px; color: rgba(255,255,255,0.4); }
+.login-right { flex: 1; background: white; padding: 44px 40px; display: flex; flex-direction: column; justify-content: center; }
+.login-right h3 { font-size: 22px; font-weight: 800; color: var(--gray-800); margin-bottom: 6px; }
+.login-right .sub { font-size: 13px; color: var(--gray-500); margin-bottom: 28px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 7px; }
+.input-wrap { position: relative; }
+.input-wrap input { width: 100%; padding: 13px 16px 13px 44px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Outfit', sans-serif; color: var(--gray-800); background: var(--gray-50); transition: all 0.2s; outline: none; }
+.input-wrap input:focus { border-color: var(--ms-green); background: white; box-shadow: 0 0 0 4px rgba(16,124,16,0.1); }
+.input-wrap .icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+.input-wrap .icon svg { width: 16px; height: 16px; fill: currentColor; }
+.toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--gray-400); cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+.toggle-password:hover { color: var(--gray-600); }
+.toggle-password svg { width: 18px; height: 18px; fill: currentColor; }
+.pwd-input-field { padding-right: 44px !important; }
+.btn-primary { width: 100%; padding: 14px; background: var(--ms-green); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+.btn-primary:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
+.btn-primary svg { width: 17px; height: 17px; fill: white; }
+.login-error { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: var(--radius-xs); padding: 12px 16px; font-size: 13px; color: #991b1b; margin-bottom: 18px; display: none; }
+.login-error.show { display: block; }
 
-  /* LEFT PANEL */
-  .left-panel {
-    width: 380px;
-    min-width: 320px;
-    background: var(--ms-green);
-    color: white;
-    padding: 48px 36px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-  }
+#dashboardPage { display: none; min-height: 100vh; position: relative; }
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w); background: var(--ms-green); display: flex; flex-direction: column; z-index: 100; overflow-y: auto; transition: transform 0.3s ease; }
+.sidebar-brand { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+.sidebar-nav { flex: 1; padding: 12px 0; }
+.nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; padding: 16px 20px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-radius: 0; transition: all 0.15s; position: relative; color: rgba(255,255,255,0.75); font-size: 13.5px; font-weight: 500; user-select: none; border: none; background: none; width: 100%; text-align: left; font-family: 'Outfit', sans-serif; }
+.nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+.nav-item.active { background: rgba(255,255,255,0.16); color: white; font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: white; border-radius: 0 3px 3px 0; }
+.nav-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-icon svg { width: 17px; height: 17px; fill: currentColor; }
+.nav-badge { margin-left: auto; background: #ef4444; color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; min-width: 20px; text-align: center; }
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.12); }
+.btn-logout { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.08); border: none; border-radius: var(--radius-xs); padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Outfit', sans-serif; transition: all 0.15s; }
+.btn-logout:hover { background: rgba(255,255,255,0.16); color: white; }
+.btn-logout svg { width: 16px; height: 16px; fill: currentColor; }
 
-  .left-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 50%);
-    pointer-events: none;
-  }
+.main-content { margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { height: var(--topbar-h); background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 28px; gap: 16px; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow-sm); }
+.mobile-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--gray-700); padding: 6px; border-radius: 6px; }
+.mobile-toggle svg { width: 24px; height: 24px; fill: currentColor; display: block; }
+.mobile-toggle:hover { background: var(--gray-100); }
+.topbar-title { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+.topbar-sub { font-size: 12px; color: var(--gray-400); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.admin-chip { display: flex; align-items: center; gap: 8px; background: var(--ms-green-pale); border-radius: 20px; padding: 6px 14px 6px 6px; }
+.admin-avatar { width: 28px; height: 28px; background: var(--ms-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
+.admin-name { font-size: 13px; font-weight: 600; color: var(--ms-green-dark); }
+.page-content { flex: 1; padding: 28px; }
 
-  .left-panel::after {
-    content: '';
-    position: absolute;
-    bottom: -60px;
-    right: -60px;
-    width: 240px;
-    height: 240px;
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 50%;
-    pointer-events: none;
-  }
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  .dot-grid {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
-    background-size: 24px 24px;
-    pointer-events: none;
-  }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card { background: white; border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 16px; border: 1px solid var(--gray-200); transition: all 0.2s; }
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stat-icon svg { width: 22px; height: 22px; fill: white; }
+.stat-icon.green { background: var(--ms-green); }
+.stat-icon.blue { background: #3b82f6; }
+.stat-icon.orange { background: #f59e0b; }
+.stat-icon.purple { background: #8b5cf6; }
+.stat-value { font-size: 28px; font-weight: 800; color: var(--gray-800); line-height: 1; }
+.stat-label { font-size: 12px; color: var(--gray-500); font-weight: 500; margin-top: 4px; }
 
-  .brand-section { position: relative; z-index: 1; }
+.card { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); overflow: hidden; margin-bottom: 20px; }
+.card-header { padding: 18px 22px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 12px; }
+.card-header h3 { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+.card-header .count-badge { background: var(--ms-green-pale); color: var(--ms-green-dark); font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-left: auto; }
+.card-body { padding: 22px; }
 
-  .logo-area {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 32px;
-  }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-xs); font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.btn svg { width: 14px; height: 14px; fill: currentColor; }
+.btn-green { background: var(--ms-green); color: white; }
+.btn-green:hover { background: var(--ms-green-dark); }
+.btn-outline { background: white; color: var(--gray-700); border: 1px solid var(--gray-200); }
+.btn-outline:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn-danger { background: var(--error-bg); color: var(--error); border: 1px solid var(--error-border); }
+.btn-danger:hover { background: #fee2e2; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-xs { padding: 4px 9px; font-size: 11px; }
 
-  .logo-img-wrap {
-    width: 52px;
-    height: 52px;
-    background: white;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: var(--gray-50); }
+th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+td { padding: 12px 14px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--gray-50); }
 
-  .logo-img-wrap img {
-    width: 44px;
-    height: 44px;
-    object-fit: contain;
-  }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: var(--ms-green-pale); color: var(--ms-green-dark); }
+.badge-gray { background: var(--gray-100); color: var(--gray-600); }
+.badge-blue { background: #eff6ff; color: #1d4ed8; }
+.badge-orange { background: var(--warning-bg); color: var(--warning); }
 
-  .logo-fallback {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.form-row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+.form-group-dash { margin-bottom: 16px; position: relative; }
+.form-group-dash label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+.form-group-dash input, .form-group-dash select, .form-group-dash textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-xs); font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--gray-800); background: var(--gray-50); outline: none; transition: all 0.15s; }
+.form-group-dash input:focus, .form-group-dash select:focus { border-color: var(--ms-green); background: white; box-shadow: 0 0 0 3px rgba(16,124,16,0.08); }
 
-  .ms-squares {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3px;
-    width: 32px;
-    height: 32px;
-  }
+.upload-zone { border: 2px dashed var(--gray-300); border-radius: var(--radius); padding: 40px 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--gray-50); }
+.upload-zone:hover, .upload-zone.drag-over { border-color: var(--ms-green); background: var(--ms-green-pale); }
+.upload-zone svg { width: 40px; height: 40px; fill: var(--gray-300); margin-bottom: 12px; }
+.upload-zone:hover svg, .upload-zone.drag-over svg { fill: var(--ms-green); }
+.upload-zone h4 { font-size: 15px; font-weight: 700; color: var(--gray-700); margin-bottom: 4px; }
+.upload-zone p { font-size: 13px; color: var(--gray-400); }
+.upload-zone .accepted { font-size: 11px; color: var(--gray-400); margin-top: 8px; }
 
-  .ms-sq { border-radius: 2px; }
-  .ms-sq:nth-child(1) { background: #f25022; }
-  .ms-sq:nth-child(2) { background: #7fba00; }
-  .ms-sq:nth-child(3) { background: #00a4ef; }
-  .ms-sq:nth-child(4) { background: #ffb900; }
+.upload-status { display: none; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-xs); margin-top: 12px; font-size: 13px; font-weight: 600; }
+.upload-status.show { display: flex; }
+.upload-status.processing { background: var(--info-bg); color: var(--info); }
+.upload-status.ready { background: var(--success-bg); color: var(--success); }
+.upload-status.err { background: var(--error-bg); color: var(--error); }
 
-  .brand-text h1 {
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
-    color: white;
-  }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
+.empty-state svg { width: 52px; height: 52px; fill: var(--gray-300); margin-bottom: 14px; }
+.empty-state h4 { font-size: 16px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; color: var(--gray-400); }
 
-  .brand-text span {
-    font-size: 12px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.75);
-  }
+.toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+.toast { background: var(--gray-800); color: white; padding: 13px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease both; max-width: 340px; }
+.toast.success { background: var(--ms-green); }
+.toast.error { background: var(--error); }
+.toast.info { background: var(--info); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-  .left-heading {
-    font-size: 26px;
-    font-weight: 800;
-    line-height: 1.25;
-    margin-bottom: 10px;
-    color: white;
-  }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
+.modal { background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; animation: fadeUp 0.3s ease; }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { font-size: 16px; font-weight: 700; }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 4px; }
+.modal-close:hover { color: var(--gray-700); background: var(--gray-100); }
+.modal-close svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+.modal-body { padding: 24px; }
 
-  .left-sub {
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.78);
-    line-height: 1.6;
-    margin-bottom: 36px;
-  }
+.activity-feed { display: flex; flex-direction: column; gap: 0; }
+.activity-item { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--gray-100); }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 36px; height: 36px; background: var(--ms-green-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.activity-dot svg { width: 16px; height: 16px; fill: var(--ms-green); }
+.activity-info { flex: 1; }
+.activity-title { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+.activity-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.activity-time { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
 
-  .divider {
-    height: 1px;
-    background: rgba(255,255,255,0.18);
-    margin-bottom: 28px;
-  }
+.filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: var(--radius-xs); font-size: 13px; font-family: 'Outfit', sans-serif; outline: none; background: white; color: var(--gray-800); }
 
-  .contact-info { position: relative; z-index: 1; }
+.cert-thumb { width: 80px; height: 54px; border-radius: 6px; object-fit: cover; background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cert-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cert-thumb-pdf { background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 700; }
 
-  .contact-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 18px;
-  }
+.notif-item { display: flex; align-items: flex-start; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--gray-100); }
+.notif-item:last-child { border-bottom: none; }
+.notif-item.unread { background: var(--ms-green-pale); margin: 0 -22px; padding: 15px 22px; border-radius: 8px; border-bottom: none; margin-bottom: 4px; }
+.notif-dot { width: 8px; height: 8px; background: var(--ms-green); border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.notif-text { flex: 1; }
+.notif-title { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+.notif-detail { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.notif-time { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
 
-  .contact-icon {
-    width: 32px;
-    height: 32px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
 
-  .contact-icon svg {
-    width: 15px;
-    height: 15px;
-    fill: white;
-    opacity: 0.9;
-  }
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+  .main-content { margin-left: 0; }
+  .form-row { grid-template-columns: 1fr; }
+  .mobile-toggle { display: block; }
+  .topbar { padding: 0 16px; gap: 12px; }
+  .topbar-title { font-size: 16px; }
+  .page-content { padding: 16px; }
+  .sidebar-overlay.active { display: block; animation: fadeIn 0.3s ease; }
+}
 
-  .contact-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.55);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 2px;
-  }
-
-  .contact-value {
-    font-size: 13px;
-    color: rgba(255,255,255,0.88);
-    line-height: 1.4;
-  }
-
-  .left-footer {
-    margin-top: auto;
-    position: relative;
-    z-index: 1;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255,255,255,0.12);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .left-footer p {
-    font-size: 11px;
-    color: rgba(255,255,255,0.45);
-    margin: 0;
-  }
-
-  .secret-admin-link {
-    font-size: 11px;
-    color: rgba(255,255,255,0.25);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .secret-admin-link:hover { color: rgba(255,255,255,0.8); }
-
-  /* RIGHT PANEL */
-  .right-panel {
-    flex: 1;
-    background: var(--white);
-    padding: 48px 48px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    max-height: 100vh;
-    overflow-y: auto;
-  }
-
-  .right-header { margin-bottom: 36px; }
-
-  .right-header h2 {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--gray-800);
-    margin-bottom: 8px;
-  }
-
-  .right-header p {
-    font-size: 14px;
-    color: var(--gray-600);
-    line-height: 1.6;
-  }
-
-  .search-group { margin-bottom: 20px; }
-
-  .search-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 8px;
-  }
-
-  .input-wrap { position: relative; }
-
-  .input-wrap input {
-    width: 100%;
-    padding: 14px 18px 14px 48px;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-family: 'Outfit', sans-serif;
-    color: var(--gray-800);
-    background: var(--gray-50);
-    transition: all 0.2s ease;
-    outline: none;
-  }
-
-  .input-wrap input:focus {
-    border-color: var(--ms-green);
-    background: white;
-    box-shadow: 0 0 0 4px rgba(16,124,16,0.1);
-  }
-
-  .input-wrap input::placeholder { color: var(--gray-400); }
-
-  .input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--gray-400);
-  }
-
-  .input-icon svg { width: 18px; height: 18px; fill: currentColor; }
-
-  .btn-search {
-    width: 100%;
-    padding: 15px;
-    background: var(--ms-green);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    letter-spacing: 0.01em;
-  }
-
-  .btn-search:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
-  .btn-search:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
-  .btn-search svg { width: 18px; height: 18px; fill: white; }
-
-  .btn-outline-menu {
-    width: 100%;
-    padding: 15px;
-    background: white;
-    color: var(--gray-700);
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-outline-menu:hover { border-color: var(--ms-green); color: var(--ms-green); background: var(--ms-green-pale); }
-
-  /* RESULT AREA */
-  .result-area { margin-top: 28px; }
-
-  .result-card {
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius);
-    padding: 28px;
-    animation: slideIn 0.4s ease both;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .result-card-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--gray-200);
-  }
-
-  .result-avatar {
-    width: 52px;
-    height: 52px;
-    background: var(--ms-green);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .result-name { font-size: 18px; font-weight: 700; color: var(--gray-800); }
-  .result-badge {
-    display: inline-block;
-    background: var(--ms-green-pale);
-    color: var(--ms-green-dark);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-top: 4px;
-    letter-spacing: 0.04em;
-  }
-
-  .result-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 22px;
-  }
-
-  .result-field label {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 4px;
-  }
-
-  .result-field span {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gray-800);
-  }
-
-  .btn-download {
-    width: 100%;
-    padding: 14px;
-    background: var(--ms-green);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-download:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
-  .btn-download:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
-  .btn-download svg { width: 16px; height: 16px; fill: white; }
-
-  /* PROJECTS AREA */
-  .project-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    box-shadow: var(--shadow-sm);
-  }
-  .project-info h4 {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--gray-800);
-    margin-bottom: 4px;
-  }
-  .project-info p {
-    font-size: 13px;
-    color: var(--gray-500);
-    line-height: 1.4;
-  }
-  .btn-view-proj {
-    background: var(--info-bg);
-    color: var(--info);
-    border: 1px solid rgba(3,105,161,0.2);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: 0.2s;
-    white-space: nowrap;
-  }
-  .btn-view-proj:hover { background: #e0f2fe; }
-
-  .error-box {
-    background: var(--error-bg);
-    border: 1px solid var(--error-border);
-    border-radius: var(--radius-sm);
-    padding: 18px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    animation: slideIn 0.3s ease both;
-  }
-  .error-box svg { width: 20px; height: 20px; fill: var(--error); flex-shrink: 0; margin-top: 1px; }
-  .error-box p { font-size: 14px; color: #991b1b; line-height: 1.5; }
-  .error-box strong { display: block; font-weight: 700; margin-bottom: 4px; }
-
-  /* MODALS */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
-  .modal { background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg); max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; animation: fadeUp 0.3s ease; }
-  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
-  .modal-header h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
-  .modal-close { background: none; border: none; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 4px; }
-  .modal-close:hover { color: var(--gray-700); background: var(--gray-100); }
-  .modal-close svg { width: 24px; height: 24px; fill: currentColor; display: block; }
-  .modal-body { padding: 24px; }
-
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  /* TOAST */
-  .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-  .toast { background: var(--gray-800); color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease both; max-width: 340px; }
-  .toast.success { background: var(--ms-green); }
-  .toast.error { background: var(--error); }
-  @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to   { opacity: 1; transform: translateX(0); } }
-
-  .loading-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  @media (max-width: 768px) {
-    .portal-wrapper { flex-direction: column; border-radius: 20px; }
-    .left-panel { width: 100%; min-width: 0; padding: 32px 24px; }
-    .right-panel { padding: 32px 24px; }
-    .result-fields { grid-template-columns: 1fr; }
-    .contact-info { display: none; }
-  }
+@media (max-width: 768px) {
+  .login-wrapper { flex-direction: column; min-height: auto; border-radius: 20px; }
+  .login-left { width: 100%; min-width: 0; padding: 32px 24px; }
+  .login-right { padding: 32px 24px; }
+}
 </style>
 </head>
 <body>
 
-<div class="portal-wrapper">
-  <div class="left-panel">
-    <div class="dot-grid"></div>
-    <div class="brand-section">
-      <div class="logo-area">
+<div id="globalLoader">
+  <div class="loader-circle"></div>
+  <div class="loader-text">Syncing Database...</div>
+</div>
+
+<div id="loginPage">
+  <div class="login-wrapper">
+    <div class="login-left">
+      <div class="dot-grid"></div>
+      <div class="logo-area" style="margin-bottom: 24px;">
         <div class="logo-img-wrap">
           <img src="logo.png" alt="Microsoft Imagine Academy Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="logo-fallback" style="display:none;">
@@ -566,101 +289,409 @@
         </div>
         <div class="brand-text">
           <h1>Microsoft<br>Imagine Academy</h1>
-          <span>Empowering Digital Futures</span>
+          <span>Admin Portal</span>
         </div>
       </div>
-
-      <h2 class="left-heading">Welcome<br>to the<br>Student Portal</h2>
-      <p class="left-sub">Verify and download your official Microsoft Imagine Academy certificates securely and instantly.</p>
-      <div class="divider"></div>
-    </div>
-
-    <div class="contact-info">
-      <a href="https://dorvastechnologies.vercel.app/" target="_blank" style="text-decoration:none; color:inherit;">
-        <div class="contact-item" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-          <div class="contact-icon">
-            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-          </div>
-          <div>
-            <div class="contact-label">Developer</div>
-            <div class="contact-value">Dorvas Technologies</div>
-          </div>
-        </div>
-      </a>
-      <div class="contact-item">
-        <div class="contact-icon">
-          <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        </div>
-        <div>
-          <div class="contact-label">Phone</div>
-          <div class="contact-value">(234)08162337303</div>
-        </div>
-      </div>
-      <div class="contact-item">
-        <div class="contact-icon">
-          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-        </div>
-        <div>
-          <div class="contact-label">Email</div>
-          <div class="contact-value">microsoftportharcourt@gmail.com</div>
-        </div>
+      <h2>Admin Dashboard</h2>
+      <p>Manage students, certificates, course projects, and track activity securely linked to Google Sheets.</p>
+      <div class="login-left-footer" style="margin-top:auto">
+        <p>© Microsoft Imagine Academy</p>
       </div>
     </div>
-
-    <div class="left-footer">
-      <p>© Microsoft Imagine Academy. All rights reserved.</p>
-      <a href="admin.html" class="secret-admin-link">Admin Login</a>
-    </div>
-  </div>
-
-  <div class="right-panel">
-    <div class="right-header">
-      <h2>Find Your Record</h2>
-      <p>Enter your full name exactly as registered to locate your certificates and course projects.</p>
-    </div>
-
-    <div class="search-group">
-      <label for="nameInput">Full Name</label>
-      <div class="input-wrap">
-        <span class="input-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-        </span>
-        <input type="text" id="nameInput" placeholder="e.g. John Adebayo Doe" autocomplete="off">
+    <div class="login-right">
+      <h3>Welcome Back</h3>
+      <p class="sub">Sign in to access the admin dashboard</p>
+      <div class="login-error" id="loginError">Invalid username or password. Please try again.</div>
+      <div class="form-group">
+        <label>Email / Username</label>
+        <div class="input-wrap">
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></span>
+          <input type="text" id="loginUser" placeholder="admin@email.com" autocomplete="username">
+        </div>
       </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
+          <input type="password" id="loginPass" class="pwd-input-field" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPass', this)" title="Show Password">
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="doLogin()">
+        <svg viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+        Sign In
+      </button>
     </div>
-
-    <button class="btn-search" id="searchBtn" onclick="searchCertificate()">
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      Search Record
-    </button>
-
-    <div class="result-area" id="resultArea"></div>
-
-    <div class="divider" style="margin: 40px 0;"></div>
-    
-    <div class="right-header" style="margin-bottom: 24px;">
-      <h2 style="font-size: 22px;">Course Projects</h2>
-      <p style="font-size: 13px;">Browse and download project materials assigned to various classes.</p>
-    </div>
-    <button class="btn-outline-menu" onclick="openProjectsModal()">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-      Browse All Course Projects
-    </button>
-
   </div>
 </div>
 
-<div id="projectsModalOverlay" class="modal-overlay" style="display:none" onclick="closeProjectsModal(event)">
-  <div class="modal" id="projectsModalBox" style="max-width: 700px; width:100%;">
-    <div class="modal-header">
-      <h3>All Course Projects</h3>
-      <button class="modal-close" onclick="closeProjectsModal()">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+<div id="dashboardPage">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-area" style="margin-bottom: 0;">
+        <div class="logo-img-wrap" style="width:38px; height:38px; border-radius:8px;">
+          <img src="logo.png" alt="Logo" style="width:30px; height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="logo-fallback" style="display:none; width:30px; height:30px;">
+            <div class="ms-squares" style="width:20px; height:20px;">
+              <div class="ms-sq"></div><div class="ms-sq"></div><div class="ms-sq"></div><div class="ms-sq"></div>
+            </div>
+          </div>
+        </div>
+        <div class="brand-text">
+          <h1 style="font-size:12px;">Imagine Academy</h1>
+          <span style="font-size:10px;">Admin Panel</span>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <button class="nav-item active" onclick="showSection('dashboard', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></span>
+        Dashboard
+      </button>
+      <div class="nav-section-label">Management</div>
+      <button class="nav-item" onclick="showSection('uploadStudents', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></span>
+        Upload Students
+      </button>
+      <button class="nav-item" onclick="showSection('uploadCerts', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
+        Register Certificates
+      </button>
+      <button class="nav-item" onclick="showSection('projects', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></span>
+        Manage Projects
+      </button>
+      <div class="nav-section-label">Records</div>
+      <button class="nav-item" onclick="showSection('studentRecords', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.33C18 2.52 15.52 1 13 1c-1.4 0-2.71.59-3.71 1.57L8 3.86 6.71 2.57C5.71 1.59 4.4 1 3 1 .48 1 0 3.52 0 4.67 0 5.12.11 5.56.18 6H-2v2h22V6zm-5 2H9V6h6v2zM4 10v12h16V10H4zm8 11l-5-5 1.41-1.41L12 18.17l7.59-7.59L21 12l-9 9z"/></svg></span>
+        Student Records
+      </button>
+      <button class="nav-item" onclick="showSection('certRecords', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></span>
+        Certificate Records
+      </button>
+      <button class="nav-item" id="navNotifications" onclick="showSection('notifications', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></span>
+        Notifications
+        <span class="nav-badge" id="notifBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('settings', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg></span>
+        Settings
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">
+        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        Logout
       </button>
     </div>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="mobile-toggle" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <div>
+        <div class="topbar-title" id="pageTitle">Dashboard</div>
+        <div class="topbar-sub" id="pageSub" style="display:none;">Overview of all activity</div>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-chip">
+          <div class="admin-avatar" id="adminAvatar">A</div>
+          <span class="admin-name" id="adminName">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <div class="section active" id="sec-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+            <div class="stat-info"><div class="stat-value" id="statStudents">0</div><div class="stat-label">Total Students</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+            <div class="stat-info"><div class="stat-value" id="statCerts">0</div><div class="stat-label">Certificates Uploaded</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
+            <div class="stat-info"><div class="stat-value" id="statDownloads">0</div><div class="stat-label">Total Downloads</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+            <div class="stat-info"><div class="stat-value" id="statUnread">0</div><div class="stat-label">Pending Notifications</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+            <h3>Recent Download Activity</h3>
+          </div>
+          <div class="card-body" id="activityFeed">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+              <h4>No Activity Yet</h4><p>Student certificate downloads will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-uploadStudents">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+            <h3>Upload Students from Excel or CSV</h3>
+          </div>
+          <div class="card-body">
+            <div class="upload-zone" id="studentDropZone" onclick="document.getElementById('studentFileInput').click()">
+              <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              <h4>Drop Excel or CSV File Here</h4>
+              <p>or click to browse</p>
+              <div class="accepted">Accepted: .xlsx &nbsp;·&nbsp; .xls &nbsp;·&nbsp; .csv</div>
+            </div>
+            <div class="upload-status" id="uploadStatus"></div>
+            <input type="file" id="studentFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleStudentFile(this.files[0])">
+
+            <div id="importPreview" style="display:none; margin-top:20px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+                <h4 style="font-size:14px;font-weight:700;color:var(--gray-800)">Preview — <span id="previewCount">0</span> records found</h4>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-outline btn-sm" onclick="cancelImport()">Cancel</button>
+                  <button class="btn btn-green btn-sm" onclick="confirmImport()">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    Confirm Import
+                  </button>
+                </div>
+              </div>
+              <div class="table-wrap" style="max-height:300px;overflow-y:auto;">
+                <table id="previewTable">
+                  <thead><tr><th>#</th><th>Full Name</th><th>Course</th><th>Class/Batch</th><th>Email</th><th>Phone</th></tr></thead>
+                  <tbody id="previewTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            <h3>Add Student Manually</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group-dash"><label>Full Name *</label><input type="text" id="manFullName" placeholder="e.g. John Adebayo Doe"></div>
+              <div class="form-group-dash"><label>Course *</label><input type="text" id="manCourse" placeholder="e.g. Microsoft Azure Fundamentals"></div>
+              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="manBatch" placeholder="e.g. Batch 2024-A"></div>
+              <div class="form-group-dash"><label>Email</label><input type="email" id="manEmail" placeholder="student@email.com"></div>
+              <div class="form-group-dash"><label>Phone</label><input type="text" id="manPhone" placeholder="+234 xxx xxx xxxx"></div>
+            </div>
+            <button class="btn btn-green" onclick="addStudentManually()">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+              Add Student
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-uploadCerts">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+            <h3>Register Certificate Template</h3>
+          </div>
+          <div class="card-body">
+            <p style="font-size: 13px; color: var(--gray-500); margin-bottom: 18px;">
+              Because images are hosted on GitHub, type the exact filename (e.g. <strong>msword-cert.png</strong>) of the uploaded image below.
+            </p>
+            <div class="form-row">
+              <div class="form-group-dash" style="grid-column: 1 / -1;">
+                <label>Certificate File Name (from GitHub) *</label>
+                <input type="text" id="certFileNameInput" placeholder="e.g. msword-cert.png">
+              </div>
+              <div class="form-group-dash"><label>Certificate Title *</label><input type="text" id="certName" placeholder="e.g. Certificate of Completion"></div>
+              <div class="form-group-dash"><label>Course Name *</label><input type="text" id="certCourse" placeholder="e.g. Microsoft Azure Fundamentals" list="coursesList"><datalist id="coursesList"></datalist></div>
+              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="certBatch" placeholder="e.g. Batch 2024-A" list="batchesList"><datalist id="batchesList"></datalist></div>
+              <div class="form-group-dash"><label>Date Issued *</label><input type="date" id="certDate"></div>
+              <div class="form-group-dash"><label>Issuing Authority</label><input type="text" id="certAuthority" placeholder="e.g. Microsoft Nigeria"></div>
+              <div class="form-group-dash"><label>Certificate Type</label><input type="text" id="certType" placeholder="e.g. Certificate of Attendance"></div>
+            </div>
+            <button class="btn btn-green" onclick="saveCertificate()">
+              <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+              Save Certificate Configuration
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-projects">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+            <h3>Upload Course Project</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group-dash"><label>Project Title *</label><input type="text" id="projTitle" placeholder="e.g. Final Web Project"></div>
+              <div class="form-group-dash"><label>Course *</label><input type="text" id="projCourse" placeholder="e.g. MS Word" list="coursesList"></div>
+              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="projBatch" placeholder="e.g. YEAR 9" list="batchesList"></div>
+              <div class="form-group-dash"><label>Document Link (Google Drive, GitHub, etc.) *</label><input type="url" id="projUrl" placeholder="https://..."></div>
+              <div class="form-group-dash" style="grid-column: 1/-1"><label>Description</label><textarea id="projDesc" rows="2" placeholder="Instructions..."></textarea></div>
+            </div>
+            <button class="btn btn-green" onclick="addProject()">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+              Add Project
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>All Projects</h3>
+            <span class="count-badge" id="projCountBadge">0</span>
+          </div>
+          <div class="card-body">
+             <div class="table-wrap">
+               <table id="projTable">
+                 <thead><tr><th>Title</th><th>Course</th><th>Batch</th><th>Link</th><th>Actions</th></tr></thead>
+                 <tbody id="projTbody"></tbody>
+               </table>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-studentRecords">
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap;">
+            <h3>All Students</h3>
+            <span class="count-badge" id="studentCountBadge">0</span>
+            <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="exportStudentsCSV()">
+              <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Export CSV
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" id="studentSearch" placeholder="Search by name..." oninput="renderStudentTable()" style="flex:1;min-width:160px;">
+              <select id="filterCourse" onchange="renderStudentTable()"><option value="">All Courses</option></select>
+              <select id="filterBatch" onchange="renderStudentTable()"><option value="">All Batches</option></select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Full Name</th><th>Course</th><th>Class/Batch</th><th>Email</th><th>Phone</th><th>Cert Status</th><th>Downloads</th><th>Action</th></tr></thead>
+                <tbody id="studentTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-certRecords">
+        <div class="card">
+          <div class="card-header">
+            <h3>All Certificates</h3>
+            <span class="count-badge" id="certCountBadge">0</span>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Preview</th><th>Certificate Title</th><th>Course</th><th>Class/Batch</th><th>Date Issued</th><th>Eligible Students</th><th>Downloads</th><th>Actions</th></tr></thead>
+                <tbody id="certTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-notifications">
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap;">
+            <h3>Download Notifications</h3>
+            <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="markAllRead()">Mark All as Read</button>
+          </div>
+          <div class="card-body" id="notifList">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <h4>No Notifications</h4><p>Student certificate download events will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sec-settings">
+        <div class="card" style="max-width:540px; margin-bottom:20px;">
+          <div class="card-header"><h3>Change Admin Credentials</h3></div>
+          <div class="card-body">
+            <div class="form-group-dash"><label>New Username / Email</label><input type="text" id="newUsername" placeholder="Enter new username or email"></div>
+            <div class="form-group-dash">
+              <label>Current Password</label>
+              <input type="password" id="currentPass" class="pwd-input-field" placeholder="Enter current password">
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('currentPass', this)"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
+            </div>
+            <div class="form-group-dash">
+              <label>New Password</label>
+              <input type="password" id="newPass" class="pwd-input-field" placeholder="Enter new password">
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPass', this)"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
+            </div>
+            <div class="form-group-dash">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirmPass" class="pwd-input-field" placeholder="Repeat new password">
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPass', this)"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
+            </div>
+            <button class="btn btn-green" onclick="changeCredentials()">
+              <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+        <div class="card" style="max-width:540px; border:1px solid var(--error-border);">
+          <div class="card-header"><h3 style="color:var(--error)">Danger Zone</h3></div>
+          <div class="card-body">
+            <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">This will permanently delete all students, certificates, projects, and notification records. This action cannot be undone.</p>
+            <button class="btn btn-danger" onclick="resetAllData()">
+              <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              Reset All Data
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <h3 id="modalTitle">Preview Certificate</h3>
+      <button class="modal-close" onclick="closeModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="assignModalOverlay" class="modal-overlay" style="display:none" onclick="closeAssignModal(event)">
+  <div class="modal" id="assignModalBox" style="max-width: 450px;">
+    <div class="modal-header">
+      <h3>Manual Certificate Assignment</h3>
+      <button class="modal-close" onclick="closeAssignModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
     <div class="modal-body">
-       <div id="projectsLoading" style="text-align:center; padding:20px; color:var(--gray-500);">Loading projects...</div>
-       <div id="projectsList" style="display:grid; gap:12px;"></div>
+      <p id="assignStudentName" style="margin-bottom:16px;font-size:13px;color:var(--gray-600);"></p>
+      <input type="hidden" id="assignStudentId">
+      <div class="form-group-dash">
+        <label>Select Certificate</label>
+        <select id="assignCertSelect"></select>
+      </div>
+      <button class="btn btn-green" style="width:100%; justify-content:center; margin-top:8px;" onclick="saveManualAssign()">Save Assignment</button>
     </div>
   </div>
 </div>
@@ -668,17 +699,18 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ===================== DATABASE CONFIG =====================
+// ===================== CONFIG =====================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDW7ODHwsLUleRQOBndTVT_toClQnLytv5DHQzwF4ZIUOjwi5l12mnDIeDpnUteb-8/exec';
+
+function showLoader() { document.getElementById('globalLoader').style.display = 'flex'; }
+function hideLoader() { document.getElementById('globalLoader').style.display = 'none'; }
 
 async function fetchSheet(sheetName) {
   try {
     const res = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
-    return await res.json();
-  } catch(e) {
-    console.error("Database fetch error:", e);
-    return [];
-  }
+    const json = await res.json();
+    return Array.isArray(json) ? json : [];
+  } catch(e) { console.error('DB fetch error:', e); return []; }
 }
 
 async function saveSheet(sheetName, data) {
@@ -686,322 +718,720 @@ async function saveSheet(sheetName, data) {
     await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ sheet: sheetName, data: data }),
+      body: JSON.stringify({ sheet: sheetName, data }),
       redirect: 'follow'
     });
-  } catch(e) { console.error("Database save error:", e); }
+  } catch(e) { console.error('DB save error:', e); }
 }
 
-// ===================== UTILS =====================
+let gStudents = [], gCerts = [], gNotifs = [], gProjects = [];
+let pendingImport = [];
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+// ===================== HELPERS =====================
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+// ===================== PASSWORD TOGGLE =====================
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon = btn.querySelector('svg');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+    btn.title = 'Hide Password';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+    btn.title = 'Show Password';
+  }
+}
+
+// ===================== TOAST =====================
 function showToast(message, type = 'info', duration = 3500) {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   const icons = {
-    success: `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`,
-    error: `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
-    info: `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`
+    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+    error: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+    info: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`
   };
   toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
   container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, duration);
+  setTimeout(() => {
+    toast.style.cssText += 'opacity:0;transform:translateX(20px);transition:all 0.3s;';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
 }
 
-function getInitials(name) {
-  if (!name) return '';
-  return name.trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join('');
+// ===================== MOBILE SIDEBAR =====================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ===================== LOGIN =====================
+async function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!user || !pass) { document.getElementById('loginError').classList.add('show'); return; }
+  showLoader();
+
+  let credsList = await fetchSheet('Credentials');
+  if (!credsList || credsList.length === 0) {
+    credsList = [
+      { username: 'microsoftportharcourt@gmail.com', password: 'spring2019' },
+      { username: 'adielasam2015@gmail.com', password: '123456' }
+    ];
+    await saveSheet('Credentials', credsList);
+  }
+
+  const validUser = credsList.find(c => c.username === user && c.password === pass);
+  if (validUser) {
+    sessionStorage.setItem('mia_session', JSON.stringify({ username: user, loginAt: Date.now() }));
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    await initDashboard(user);
+  } else {
+    hideLoader();
+    document.getElementById('loginError').classList.add('show');
+    document.getElementById('loginPass').value = '';
+  }
 }
 
-function escapeAttr(str) {
-  if (!str) return '';
-  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+function doLogout() {
+  if (!confirm('Are you sure you want to logout?')) return;
+  sessionStorage.removeItem('mia_session');
+  document.getElementById('dashboardPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
 }
 
-// ===================== SEARCH =====================
-async function searchCertificate() {
-  const input = document.getElementById('nameInput').value.trim();
-  const resultArea = document.getElementById('resultArea');
-  const btn = document.getElementById('searchBtn');
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  if (!input) {
-    showToast('Please enter your full name to search.', 'error');
-    document.getElementById('nameInput').focus();
+// ===================== INIT =====================
+async function initDashboard(username) {
+  document.getElementById('adminAvatar').textContent = username.substring(0, 2).toUpperCase();
+  document.getElementById('adminName').textContent = username;
+  document.getElementById('newUsername').value = username;
+  initDropZone();
+  await refreshDashboard();
+  hideLoader();
+}
+
+async function refreshDashboard() {
+  showLoader();
+  gStudents = await fetchSheet('Students');
+  gCerts = await fetchSheet('Certificates');
+  gNotifs = await fetchSheet('Notifications');
+  gProjects = await fetchSheet('Projects');
+
+  const unread = gNotifs.filter(n => !n.read).length;
+  document.getElementById('statStudents').textContent = gStudents.length;
+  document.getElementById('statCerts').textContent = gCerts.length;
+  document.getElementById('statDownloads').textContent = gNotifs.length;
+  document.getElementById('statUnread').textContent = unread;
+
+  const badge = document.getElementById('notifBadge');
+  if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
+
+  const feed = document.getElementById('activityFeed');
+  const recent = gNotifs.slice(0, 10);
+  if (!recent.length) {
+    feed.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><h4>No Activity Yet</h4><p>Student downloads appear here.</p></div>`;
+  } else {
+    feed.innerHTML = `<div class="activity-feed">${recent.map(n => `
+      <div class="activity-item">
+        <div class="activity-dot"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
+        <div class="activity-info">
+          <div class="activity-title">${escHtml(n.studentName)} downloaded <strong>${escHtml(n.certName)}</strong></div>
+          <div class="activity-meta">${escHtml(n.course)} · ${escHtml(n.classBatch || '')}</div>
+        </div>
+        <div class="activity-time">${timeAgo(n.timestamp)}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  populateCoursesBatches();
+  renderProjTable();
+  hideLoader();
+}
+
+function populateCoursesBatches() {
+  const courses = [...new Set(gStudents.map(s => s.course).filter(Boolean))];
+  const batches = [...new Set(gStudents.map(s => s.classBatch).filter(Boolean))];
+  document.getElementById('coursesList').innerHTML = courses.map(c => `<option value="${escHtml(c)}">`).join('');
+  document.getElementById('batchesList').innerHTML = batches.map(b => `<option value="${escHtml(b)}">`).join('');
+}
+
+// ===================== NAV =====================
+const sectionMeta = {
+  dashboard: { title: 'Dashboard', sub: 'Overview of all activity' },
+  uploadStudents: { title: 'Upload Students', sub: 'Import student records via Excel or manually' },
+  uploadCerts: { title: 'Register Certificates', sub: 'Register certificate templates for courses' },
+  projects: { title: 'Course Projects', sub: 'Upload and manage project documents for students' },
+  studentRecords: { title: 'Student Records', sub: 'Browse and manage all student records' },
+  certRecords: { title: 'Certificate Records', sub: 'All registered certificate templates' },
+  notifications: { title: 'Notifications', sub: 'Student certificate download activity' },
+  settings: { title: 'Settings', sub: 'Manage admin credentials and data' }
+};
+
+async function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const meta = sectionMeta[name] || {};
+  document.getElementById('pageTitle').textContent = meta.title || name;
+  document.getElementById('pageSub').textContent = meta.sub || '';
+  if (window.innerWidth <= 900) closeSidebar();
+  if (name === 'dashboard') await refreshDashboard();
+  if (name === 'studentRecords') { renderStudentTable(); populateStudentFilters(); }
+  if (name === 'certRecords') renderCertTable();
+  if (name === 'notifications') renderNotifications();
+  if (name === 'uploadCerts' || name === 'projects') populateCoursesBatches();
+}
+
+// ===================== DROP ZONE SETUP =====================
+function initDropZone() {
+  const zone = document.getElementById('studentDropZone');
+  if (!zone) return;
+
+  zone.addEventListener('dragenter', e => { e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragover',  e => { e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', e => { e.preventDefault(); e.stopPropagation(); zone.classList.remove('drag-over'); });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleStudentFile(file);
+  });
+}
+
+// ===================== FILE UPLOAD =====================
+function setUploadStatus(type, msg) {
+  const el = document.getElementById('uploadStatus');
+  el.className = `upload-status show ${type}`;
+  el.innerHTML = msg;
+}
+function clearUploadStatus() {
+  const el = document.getElementById('uploadStatus');
+  el.className = 'upload-status';
+  el.innerHTML = '';
+}
+
+function handleStudentFile(file) {
+  if (!file) return;
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['xlsx', 'xls', 'csv'].includes(ext)) {
+    setUploadStatus('err', `❌ Unsupported file type ".${ext}". Please upload .xlsx, .xls, or .csv`);
     return;
   }
 
-  btn.innerHTML = '<div class="loading-spinner"></div> Searching Database...';
-  btn.disabled = true;
-  resultArea.innerHTML = '';
-
-  try {
-    const [students, certificates, projects] = await Promise.all([
-      fetchSheet('Students'),
-      fetchSheet('Certificates'),
-      fetchSheet('Projects')
-    ]);
-
-    const student = students.find(s => (s.fullName || '').trim().toLowerCase() === input.toLowerCase());
-
-    if (!student) {
-      resultArea.innerHTML = `
-        <div class="error-box">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          <p><strong>Result Not Found</strong>Your record is not available in the database. Please check your spelling or contact your administrator.</p>
-        </div>`;
-      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Record`;
-      btn.disabled = false;
-      return;
-    }
-
-    // UPDATED FIX: Safely check for manual assignment by converting IDs to Strings
-    let cert = null;
-    if (student.manualCertId) {
-      cert = certificates.find(c => String(c.id) === String(student.manualCertId));
-    }
-    
-    // If no manual cert, fallback to matching by Course & Batch
-    if (!cert) {
-      cert = certificates.find(c =>
-        (c.course || '').trim().toLowerCase() === (student.course || '').trim().toLowerCase() &&
-        (c.classBatch || '').trim().toLowerCase() === (student.classBatch || '').trim().toLowerCase()
-      );
-    }
-
-    const targetCourse = cert ? cert.course : student.course;
-    const targetBatch = cert ? cert.classBatch : student.classBatch;
-
-    const studentProjects = (projects || []).filter(p => 
-      (p.course || '').trim().toLowerCase() === (targetCourse || '').trim().toLowerCase() &&
-      (p.classBatch || '').trim().toLowerCase() === (targetBatch || '').trim().toLowerCase()
-    );
-
-    let resultHtml = '';
-
-    if (!cert) {
-      resultHtml += `
-        <div class="error-box">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          <p><strong>Certificate Not Ready</strong>Your record was found but your certificate template has not been registered yet. Please contact your administrator.</p>
-        </div>`;
-    } else {
-      let mappedCertName = cert.certName;
-      const sCourse = (targetCourse || '').toLowerCase();
-      
-      if (sCourse.includes('word')) mappedCertName = 'Microsoft Office Specialist (MOS) Exam 77-725 Word 2016';
-      else if (sCourse.includes('excel')) mappedCertName = 'Microsoft Office Specialist (MOS) Exam 77-727 Excel 2016';
-      else if (sCourse.includes('powerpoint')) mappedCertName = 'Microsoft Office Specialist (MOS) Exam 77-729 PowerPoint 2016';
-
-      const dateFormatted = cert.dateIssued ? new Date(cert.dateIssued).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A';
-
-      resultHtml += `
-        <div class="result-card">
-          <div class="result-card-header">
-            <div class="result-avatar">${getInitials(student.fullName)}</div>
-            <div>
-              <div class="result-name">${escapeHtml(student.fullName)}</div>
-              <span class="result-badge">✓ Certificate Found</span>
-            </div>
-          </div>
-          <div class="result-fields">
-            <div class="result-field"><label>Certificate Name</label><span>${escapeHtml(mappedCertName)}</span></div>
-            <div class="result-field"><label>Course</label><span>${escapeHtml(targetCourse)}</span></div>
-            <div class="result-field"><label>Class / Batch</label><span>${escapeHtml(targetBatch || 'N/A')}</span></div>
-            <div class="result-field"><label>Date Issued</label><span>${dateFormatted}</span></div>
-            ${cert.issuingAuthority ? `<div class="result-field"><label>Issuing Authority</label><span>${escapeHtml(cert.issuingAuthority)}</span></div>` : ''}
-            ${cert.certType ? `<div class="result-field"><label>Certificate Type</label><span>${escapeHtml(cert.certType)}</span></div>` : ''}
-          </div>
-          <button class="btn-download" onclick="downloadCertificate('${escapeAttr(student.fullName)}', '${escapeAttr(cert.id)}', '${escapeAttr(mappedCertName)}')">
-            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            Download Certificate
-          </button>
-        </div>`;
-    }
-
-    if (studentProjects.length > 0) {
-      resultHtml += `
-        <div style="margin-top:24px;">
-          <h3 style="font-size:18px;font-weight:700;margin-bottom:12px;color:var(--gray-800)">Course Projects & Materials</h3>
-          <div style="display:grid;gap:12px;">
-            ${studentProjects.map(p => `
-              <div class="project-card">
-                <div class="project-info">
-                  <h4>${escapeHtml(p.title)}</h4>
-                  <p>${escapeHtml(p.description || '')}</p>
-                </div>
-                <a href="${escapeHtml(p.fileUrl)}" target="_blank" class="btn-view-proj">View Document</a>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    resultArea.innerHTML = resultHtml;
-
-  } catch (error) {
-    showToast('Failed to connect to database. Please check your connection.', 'error');
+  if (typeof XLSX === 'undefined') {
+    setUploadStatus('err', '❌ Spreadsheet library not loaded yet. Please wait a moment and try again.');
+    return;
   }
 
-  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Record`;
-  btn.disabled = false;
-}
+  setUploadStatus('processing', '⏳ Reading file, please wait…');
+  document.getElementById('importPreview').style.display = 'none';
 
-// ===================== ALL PROJECTS MODAL =====================
-async function openProjectsModal() {
-  document.getElementById('projectsModalOverlay').style.display = 'flex';
-  document.getElementById('projectsLoading').style.display = 'block';
-  document.getElementById('projectsList').innerHTML = '';
-  
-  try {
-      const projects = await fetchSheet('Projects');
-      document.getElementById('projectsLoading').style.display = 'none';
-      if(!projects || projects.length === 0) {
-          document.getElementById('projectsList').innerHTML = '<p style="text-align:center;color:var(--gray-500);">No course projects available at the moment.</p>';
-          return;
+  const reader = new FileReader();
+  reader.onerror = () => {
+    setUploadStatus('err', '❌ Could not read the file. It may be corrupted or locked by another program.');
+  };
+
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {
+        type: 'array',
+        cellDates: true,   // parse date cells properly
+        raw: false         // format numbers/dates as strings for display
+      });
+
+      if (!wb.SheetNames || wb.SheetNames.length === 0) {
+        setUploadStatus('err', '❌ The file has no sheets. Please check the file and try again.');
+        return;
       }
-      
-      document.getElementById('projectsList').innerHTML = projects.map(p => `
-        <div class="project-card" style="display:flex; justify-content:space-between; align-items:center; background:var(--gray-50); padding:16px; border-radius:12px; border:1px solid var(--gray-200);">
-          <div>
-            <h4 style="font-size:15px; font-weight:700; color:var(--gray-800); margin-bottom:4px;">${escapeHtml(p.title)}</h4>
-            <p style="font-size:12px; color:var(--gray-500); margin-bottom:6px;">${escapeHtml(p.course)} • ${escapeHtml(p.classBatch)}</p>
-            <p style="font-size:13px; color:var(--gray-600);">${escapeHtml(p.description)}</p>
-          </div>
-          <a href="${escapeHtml(p.fileUrl)}" target="_blank" class="btn-download" style="width:auto; padding:10px 16px; font-size:13px; text-decoration:none;">View</a>
+
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
+
+      if (!rows || rows.length < 2) {
+        setUploadStatus('err', '❌ The file appears empty or only has a header row with no data underneath.');
+        return;
+      }
+
+      const rawHeaders = rows[0].map(h => String(h).replace(/^\uFEFF/, '').toLowerCase().trim());
+
+      const colMap = { fullName: -1, course: -1, classBatch: -1, email: -1, phone: -1 };
+
+      rawHeaders.forEach((h, i) => {
+        if (colMap.fullName < 0  && (h.includes('full') || h === 'name' || h === 'fullname' || h === 'student name' || h === 'studentname')) colMap.fullName = i;
+        if (colMap.course < 0   && h.includes('course')) colMap.course = i;
+        if (colMap.classBatch < 0 && (h.includes('batch') || h.includes('class'))) colMap.classBatch = i;
+        if (colMap.email < 0    && h.includes('email')) colMap.email = i;
+        if (colMap.phone < 0    && (h.includes('phone') || h.includes('tel') || h.includes('mobile'))) colMap.phone = i;
+      });
+
+      if (colMap.fullName  < 0) colMap.fullName  = 0;
+      if (colMap.course    < 0) colMap.course    = 1;
+      if (colMap.classBatch< 0) colMap.classBatch= 2;
+      if (colMap.email     < 0) colMap.email     = 3;
+      if (colMap.phone     < 0) colMap.phone     = 4;
+
+      pendingImport = rows.slice(1)
+        .filter(r => Array.isArray(r) && r.some(cell => String(cell).trim() !== ''))
+        .map(r => ({
+          fullName:   String(r[colMap.fullName]   || '').trim(),
+          course:     String(r[colMap.course]     || '').trim(),
+          classBatch: String(r[colMap.classBatch] || '').trim(),
+          email:      String(r[colMap.email]      || '').trim(),
+          phone:      String(r[colMap.phone]      || '').trim()
+        }))
+        .filter(s => s.fullName !== ''); // only keep rows that have a name
+
+      if (pendingImport.length === 0) {
+        setUploadStatus('err', `❌ No valid student rows found. Make sure the "Full Name" column is not empty.`);
+        return;
+      }
+
+      // Render preview table
+      document.getElementById('previewCount').textContent = pendingImport.length;
+      document.getElementById('previewTbody').innerHTML = pendingImport.map((s, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${escHtml(s.fullName)}</td>
+          <td>${escHtml(s.course)}</td>
+          <td>${escHtml(s.classBatch)}</td>
+          <td>${escHtml(s.email)}</td>
+          <td>${escHtml(s.phone)}</td>
+        </tr>`).join('');
+
+      document.getElementById('importPreview').style.display = 'block';
+      setUploadStatus('ready', `✅ ${pendingImport.length} student${pendingImport.length !== 1 ? 's' : ''} ready to import. Review below and click "Confirm Import".`);
+
+    } catch (err) {
+      console.error('XLSX parse error:', err);
+      setUploadStatus('err', `❌ Parse failed: ${err.message || err}. Try re-saving the file as .xlsx in Excel or Google Sheets and upload again.`);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function confirmImport() {
+  if (!pendingImport.length) return;
+  showLoader();
+
+  const importedCount = pendingImport.length;
+  const newStudents = pendingImport.map(s => ({ ...s, id: uid(), downloadCount: 0 }));
+  const combined = [...gStudents, ...newStudents];
+
+  await saveSheet('Students', combined);
+  gStudents = combined;
+
+  document.getElementById('importPreview').style.display = 'none';
+  document.getElementById('studentFileInput').value = '';
+  clearUploadStatus();
+  pendingImport = [];
+
+  showToast(`${importedCount} student${importedCount !== 1 ? 's' : ''} imported successfully!`, 'success');
+  await refreshDashboard();
+  hideLoader();
+}
+
+function cancelImport() {
+  pendingImport = [];
+  document.getElementById('importPreview').style.display = 'none';
+  document.getElementById('studentFileInput').value = '';
+  clearUploadStatus();
+}
+
+// ===================== MANUAL ADD =====================
+async function addStudentManually() {
+  const fullName   = document.getElementById('manFullName').value.trim();
+  const course     = document.getElementById('manCourse').value.trim();
+  const classBatch = document.getElementById('manBatch').value.trim();
+  const email      = document.getElementById('manEmail').value.trim();
+  const phone      = document.getElementById('manPhone').value.trim();
+
+  if (!fullName || !course || !classBatch) { showToast('Full Name, Course, and Class/Batch are required.', 'error'); return; }
+  const exists = gStudents.find(s => s.fullName.toLowerCase() === fullName.toLowerCase());
+  if (exists) { showToast('A student with this name already exists.', 'error'); return; }
+
+  showLoader();
+  gStudents.push({ id: uid(), fullName, course, classBatch, email, phone, downloadCount: 0 });
+  await saveSheet('Students', gStudents);
+  ['manFullName','manCourse','manBatch','manEmail','manPhone'].forEach(id => document.getElementById(id).value = '');
+  showToast(`Student "${fullName}" added successfully!`, 'success');
+  await refreshDashboard();
+  hideLoader();
+}
+
+async function deleteStudent(id) {
+  const s = gStudents.find(x => x.id === id);
+  if (!s) return;
+  if (!confirm(`Delete student "${s.fullName}"? This cannot be undone.`)) return;
+  showLoader();
+  gStudents = gStudents.filter(x => x.id !== id);
+  await saveSheet('Students', gStudents);
+  renderStudentTable();
+  await refreshDashboard();
+  hideLoader();
+  showToast('Student deleted.', 'info');
+}
+
+// ===================== MANUAL ASSIGN =====================
+function openAssignModal(studentId) {
+  const student = gStudents.find(s => s.id === studentId);
+  if(!student) return;
+  document.getElementById('assignStudentId').value = student.id;
+  document.getElementById('assignStudentName').innerHTML = `Assign certificate to:<br><strong style="font-size:16px;color:var(--gray-800);">${escHtml(student.fullName)}</strong>`;
+  
+  const select = document.getElementById('assignCertSelect');
+  let opts = '<option value="">-- Remove Manual Assignment (Auto Match) --</option>';
+  gCerts.forEach(c => {
+     opts += `<option value="${c.id}" ${student.manualCertId === c.id ? 'selected' : ''}>${escHtml(c.certName)} (${escHtml(c.course)} - ${escHtml(c.classBatch)})</option>`;
+  });
+  select.innerHTML = opts;
+  document.getElementById('assignModalOverlay').style.display = 'flex';
+}
+
+function closeAssignModal(e) {
+  if (e && e.target !== document.getElementById('assignModalOverlay')) return;
+  document.getElementById('assignModalOverlay').style.display = 'none';
+}
+
+async function saveManualAssign() {
+  const studentId = document.getElementById('assignStudentId').value;
+  const certId = document.getElementById('assignCertSelect').value;
+  const studentIndex = gStudents.findIndex(s => s.id === studentId);
+  
+  if(studentIndex > -1) {
+    gStudents[studentIndex].manualCertId = certId || null;
+    showLoader();
+    await saveSheet('Students', gStudents);
+    renderStudentTable();
+    document.getElementById('assignModalOverlay').style.display = 'none';
+    hideLoader();
+    showToast('Assignment updated successfully!', 'success');
+  }
+}
+
+// ===================== STUDENT TABLE =====================
+function renderStudentTable() {
+  const search      = (document.getElementById('studentSearch').value || '').toLowerCase();
+  const filterCourse= document.getElementById('filterCourse').value;
+  const filterBatch = document.getElementById('filterBatch').value;
+
+  const filtered = gStudents.filter(s => {
+    const matchSearch = !search || s.fullName.toLowerCase().includes(search) || (s.course || '').toLowerCase().includes(search);
+    const matchCourse = !filterCourse || s.course === filterCourse;
+    const matchBatch  = !filterBatch  || s.classBatch === filterBatch;
+    return matchSearch && matchCourse && matchBatch;
+  });
+
+  document.getElementById('studentCountBadge').textContent = filtered.length;
+  const tbody = document.getElementById('studentTbody');
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state" style="padding:32px"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><h4>No Students Found</h4><p>Try adjusting your search or filters.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((s, i) => {
+    const hasCert = s.manualCertId ? gCerts.some(c => c.id === s.manualCertId) : gCerts.some(c =>
+      c.course.toLowerCase() === (s.course || '').toLowerCase() &&
+      c.classBatch.toLowerCase() === (s.classBatch || '').toLowerCase()
+    );
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><strong>${escHtml(s.fullName)}</strong></td>
+      <td>${escHtml(s.course || '—')}</td>
+      <td>${escHtml(s.classBatch || '—')}</td>
+      <td>${escHtml(s.email || '—')}</td>
+      <td>${escHtml(s.phone || '—')}</td>
+      <td><span class="badge ${hasCert ? 'badge-green' : 'badge-gray'}">${hasCert ? 'Assigned' : 'Not Assigned'}</span></td>
+      <td><span class="badge badge-blue">${s.downloadCount || 0}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+            <button class="btn btn-outline btn-xs" onclick="openAssignModal('${s.id}')">Assign Cert</button>
+            <button class="btn btn-danger btn-xs" onclick="deleteStudent('${s.id}')">Delete</button>
         </div>
-      `).join('');
-  } catch(e) {
-      document.getElementById('projectsLoading').innerHTML = '<p style="color:var(--error);">Failed to load course projects.</p>';
-  }
+      </td>
+    </tr>`;
+  }).join('');
 }
 
-function closeProjectsModal(e) {
-  if (e && e.target !== document.getElementById('projectsModalOverlay')) return;
-  document.getElementById('projectsModalOverlay').style.display = 'none';
+function populateStudentFilters() {
+  const courses = [...new Set(gStudents.map(s => s.course).filter(Boolean))];
+  const batches = [...new Set(gStudents.map(s => s.classBatch).filter(Boolean))];
+  const cf = document.getElementById('filterCourse');
+  const bf = document.getElementById('filterBatch');
+  const cc = cf.value, cb = bf.value;
+  cf.innerHTML = '<option value="">All Courses</option>' + courses.map(c => `<option value="${escHtml(c)}" ${c===cc?'selected':''}>${escHtml(c)}</option>`).join('');
+  bf.innerHTML = '<option value="">All Batches</option>'  + batches.map(b => `<option value="${escHtml(b)}" ${b===cb?'selected':''}>${escHtml(b)}</option>`).join('');
 }
 
-// ===================== DOWNLOAD & CANVAS =====================
-async function downloadCertificate(studentName, certId, mappedCertName) {
-  const btn = document.querySelector('.btn-download');
-  const origHTML = btn.innerHTML;
-  btn.innerHTML = '<div class="loading-spinner"></div> Preparing Download...';
-  btn.disabled = true;
+function exportStudentsCSV() {
+  if (!gStudents.length) { showToast('No students to export.', 'error'); return; }
+  const headers = ['Full Name','Course','Class/Batch','Email','Phone','Downloads'];
+  const rows = gStudents.map(s => [s.fullName, s.course, s.classBatch, s.email, s.phone, s.downloadCount || 0]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'students.csv';
+  a.click();
+  showToast('Students exported to CSV.', 'success');
+}
 
-  try {
-    const certificates = await fetchSheet('Certificates');
-    const cert = certificates.find(c => String(c.id) === String(certId));
+// ===================== PROJECTS =====================
+async function addProject() {
+  const title = document.getElementById('projTitle').value.trim();
+  const course = document.getElementById('projCourse').value.trim();
+  const batch = document.getElementById('projBatch').value.trim();
+  const url = document.getElementById('projUrl').value.trim();
+  const desc = document.getElementById('projDesc').value.trim();
 
-    if (!cert || !cert.fileData) {
-      showToast('Certificate template not configured correctly.', 'error');
-      btn.innerHTML = origHTML;
-      btn.disabled = false;
+  if(!title || !course || !batch || !url) {
+      showToast('Title, Course, Batch, and Document Link are required.', 'error');
       return;
-    }
+  }
 
-    if (cert.fileType === 'pdf') {
-      const link = document.createElement('a');
-      link.href = cert.fileData;
-      link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`;
-      link.click();
-      await logDownload(studentName, cert, mappedCertName);
-      showToast('Certificate downloaded successfully!', 'success');
-      btn.innerHTML = origHTML;
-      btn.disabled = false;
-    } else {
-      const img = new Image();
-      img.crossOrigin = "Anonymous"; 
-      
-      img.onload = async function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+  showLoader();
+  gProjects.push({ id: uid(), title, course, classBatch: batch, fileUrl: url, description: desc, createdAt: new Date().toISOString() });
+  await saveSheet('Projects', gProjects);
+  
+  ['projTitle', 'projCourse', 'projBatch', 'projUrl', 'projDesc'].forEach(id => document.getElementById(id).value = '');
+  showToast('Project created successfully!', 'success');
+  renderProjTable();
+  hideLoader();
+}
 
-        const fontSize = Math.max(48, Math.min(90, img.width / 14));
-        ctx.font = `bold ${fontSize}px 'Georgia', serif`; 
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic'; 
-        ctx.fillStyle = '#000000';
-        ctx.fillText(studentName, img.width / 2, img.height * 0.47);
+function renderProjTable() {
+  document.getElementById('projCountBadge').textContent = gProjects.length;
+  const tbody = document.getElementById('projTbody');
+  if(!gProjects.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:32px"><h4>No Projects</h4><p>Upload a course project template above.</p></div></td></tr>`;
+      return;
+  }
+  tbody.innerHTML = gProjects.map(p => `
+    <tr>
+      <td><strong>${escHtml(p.title)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${escHtml(p.description).substring(0,30)}</span></td>
+      <td>${escHtml(p.course)}</td>
+      <td>${escHtml(p.classBatch)}</td>
+      <td><a href="${escHtml(p.fileUrl)}" target="_blank" style="color:var(--info);text-decoration:none;">View Link</a></td>
+      <td><button class="btn btn-danger btn-xs" onclick="deleteProject('${p.id}')">Delete</button></td>
+    </tr>
+  `).join('');
+}
 
-        if (cert.dateIssued) {
-          const d = new Date(cert.dateIssued);
-          const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-          const dateFontSize = Math.max(20, Math.min(36, img.width / 30));
-          ctx.font = `${dateFontSize}px 'Georgia', serif`;
-          ctx.textAlign = 'left';
-          ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
-        }
+async function deleteProject(id) {
+  if(!confirm('Are you sure you want to delete this project?')) return;
+  showLoader();
+  gProjects = gProjects.filter(p => p.id !== id);
+  await saveSheet('Projects', gProjects);
+  renderProjTable();
+  hideLoader();
+  showToast('Project deleted successfully.', 'info');
+}
 
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`;
-        link.click();
+// ===================== CERTIFICATE SAVE =====================
+async function saveCertificate() {
+  const certFileNameInput = document.getElementById('certFileNameInput').value.trim();
+  const certName          = document.getElementById('certName').value.trim();
+  const certCourse        = document.getElementById('certCourse').value.trim();
+  const certBatch         = document.getElementById('certBatch').value.trim();
+  const certDate          = document.getElementById('certDate').value;
+  const certAuthority     = document.getElementById('certAuthority').value.trim();
+  const certTypeVal       = document.getElementById('certType').value.trim();
 
-        await logDownload(studentName, cert, mappedCertName);
-        showToast('Certificate downloaded successfully!', 'success');
-        
-        btn.innerHTML = origHTML;
-        btn.disabled = false;
-      };
+  if (!certFileNameInput || !certName || !certCourse || !certBatch || !certDate) {
+    showToast('Please fill all required fields (*).', 'error'); return;
+  }
 
-      img.onerror = function() {
-        showToast('Error loading the certificate image. Verify the file name on GitHub.', 'error');
-        btn.innerHTML = origHTML;
-        btn.disabled = false;
-      };
+  showLoader();
+  gCerts.push({ id: uid(), certName, course: certCourse, classBatch: certBatch, dateIssued: certDate, issuingAuthority: certAuthority, certType: certTypeVal, fileData: certFileNameInput, fileType: 'image', fileName: certFileNameInput, uploadedAt: new Date().toISOString() });
+  await saveSheet('Certificates', gCerts);
 
-      img.src = cert.fileData; 
-    }
-  } catch (e) {
-    console.error(e);
-    showToast('Download failed. Please check connection.', 'error');
-    btn.innerHTML = origHTML;
-    btn.disabled = false;
+  ['certFileNameInput','certName','certCourse','certBatch','certDate','certAuthority','certType'].forEach(id => document.getElementById(id).value = '');
+  showToast(`Certificate "${certName}" registered!`, 'success');
+  await refreshDashboard();
+  hideLoader();
+}
+
+// ===================== CERT TABLE =====================
+function renderCertTable() {
+  document.getElementById('certCountBadge').textContent = gCerts.length;
+  const tbody = document.getElementById('certTbody');
+  if (!gCerts.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state" style="padding:32px"><h4>No Certificates</h4><p>Register certificate templates above.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = gCerts.map(c => {
+    const eligible  = gStudents.filter(s => (s.course||'').toLowerCase() === c.course.toLowerCase() && (s.classBatch||'').toLowerCase() === c.classBatch.toLowerCase()).length;
+    const downloads = gNotifs.filter(n => n.certName === c.certName && n.course === c.course).length;
+    const date      = c.dateIssued ? new Date(c.dateIssued).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+    const thumbHtml = c.fileType === 'image'
+      ? `<div class="cert-thumb"><img src="${c.fileData}" alt="cert" onerror="this.src=''; this.alt='X'"></div>`
+      : `<div class="cert-thumb cert-thumb-pdf" style="display:flex;align-items:center;justify-content:center;width:80px;height:54px;border-radius:6px;border:1px solid var(--error-border);">PDF</div>`;
+    return `<tr>
+      <td>${thumbHtml}</td>
+      <td><strong>${escHtml(c.certName)}</strong></td>
+      <td>${escHtml(c.course)}</td>
+      <td>${escHtml(c.classBatch)}</td>
+      <td>${date}</td>
+      <td><span class="badge badge-blue">${eligible}</span></td>
+      <td><span class="badge badge-green">${downloads}</span></td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-xs" onclick="previewCert('${c.id}')">Preview</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteCert('${c.id}')">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function previewCert(id) {
+  const cert = gCerts.find(c => c.id === id);
+  if (!cert) return;
+  document.getElementById('modalTitle').textContent = cert.certName;
+  document.getElementById('modalBody').innerHTML = cert.fileType === 'image'
+    ? `<img src="${cert.fileData}" style="width:100%;border-radius:8px;display:block;" onerror="this.outerHTML='<p style=\\'color:red;\\'>Image could not load. Check the filename is correct and hosted on GitHub.</p>'">`
+    : `<div style="text-align:center;padding:24px;"><p style="font-size:14px;color:var(--gray-600);">PDF: <strong>${escHtml(cert.fileName)}</strong></p><a href="${cert.fileData}" download="${escHtml(cert.fileName)}" class="btn btn-green" style="margin-top:16px;text-decoration:none;">Download PDF</a></div>`;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+async function deleteCert(id) {
+  const cert = gCerts.find(c => c.id === id);
+  if (!cert) return;
+  if (!confirm(`Delete certificate "${cert.certName}"?`)) return;
+  showLoader();
+  gCerts = gCerts.filter(c => c.id !== id);
+  await saveSheet('Certificates', gCerts);
+  renderCertTable();
+  await refreshDashboard();
+  hideLoader();
+  showToast('Certificate deleted.', 'info');
+}
+
+// ===================== NOTIFICATIONS =====================
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  if (!gNotifs.length) {
+    list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><h4>No Notifications</h4><p>Student downloads will appear here.</p></div>`;
+    return;
+  }
+  list.innerHTML = gNotifs.map(n => `
+    <div class="notif-item${n.read ? '' : ' unread'}">
+      ${!n.read ? '<div class="notif-dot"></div>' : '<div style="width:8px;height:8px;flex-shrink:0;"></div>'}
+      <div class="notif-text">
+        <div class="notif-title">${escHtml(n.studentName)} downloaded <strong>${escHtml(n.certName)}</strong></div>
+        <div class="notif-detail">Course: ${escHtml(n.course)} · Batch: ${escHtml(n.classBatch || '—')}</div>
+      </div>
+      <div class="notif-time">${timeAgo(n.timestamp)}</div>
+    </div>`).join('');
+}
+
+async function markAllRead() {
+  showLoader();
+  gNotifs = gNotifs.map(n => ({ ...n, read: true }));
+  await saveSheet('Notifications', gNotifs);
+  renderNotifications();
+  await refreshDashboard();
+  hideLoader();
+  showToast('All notifications marked as read.', 'success');
+}
+
+// ===================== SETTINGS =====================
+async function changeCredentials() {
+  const newUser     = document.getElementById('newUsername').value.trim();
+  const currentPass = document.getElementById('currentPass').value;
+  const newPass     = document.getElementById('newPass').value;
+  const confirmPass = document.getElementById('confirmPass').value;
+
+  showLoader();
+  const credsList = await fetchSheet('Credentials');
+  const session   = JSON.parse(sessionStorage.getItem('mia_session'));
+  const userIndex = credsList.findIndex(c => c.username === session.username);
+
+  if (userIndex === -1) { hideLoader(); showToast('Session error. Please re-login.', 'error'); return; }
+  if (currentPass !== credsList[userIndex].password) { hideLoader(); showToast('Current password is incorrect.', 'error'); return; }
+  if (!newUser)  { hideLoader(); showToast('Username cannot be empty.', 'error'); return; }
+  if (newPass && newPass !== confirmPass) { hideLoader(); showToast('New passwords do not match.', 'error'); return; }
+
+  credsList[userIndex] = { username: newUser, password: newPass || credsList[userIndex].password };
+  await saveSheet('Credentials', credsList);
+  session.username = newUser;
+  sessionStorage.setItem('mia_session', JSON.stringify(session));
+  document.getElementById('adminName').textContent = newUser;
+  document.getElementById('adminAvatar').textContent = newUser.substring(0, 2).toUpperCase();
+  ['currentPass','newPass','confirmPass'].forEach(id => document.getElementById(id).value = '');
+  hideLoader();
+  showToast('Credentials updated successfully!', 'success');
+}
+
+async function resetAllData() {
+  if (!confirm('Are you absolutely sure? This will permanently delete ALL students, certificates, projects, and notifications.')) return;
+  if (!confirm('FINAL WARNING: Click OK to permanently erase all data.')) return;
+  showLoader();
+  await saveSheet('Students', []);
+  await saveSheet('Certificates', []);
+  await saveSheet('Notifications', []);
+  await saveSheet('Projects', []);
+  await refreshDashboard();
+  renderStudentTable();
+  renderCertTable();
+  renderNotifications();
+  hideLoader();
+  showToast('All data has been reset.', 'info');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').style.display = 'none';
   }
 }
 
-async function logDownload(studentName, cert, mappedCertName) {
-  try {
-    const notifs = await fetchSheet('Notifications');
-    notifs.unshift({
-      id: Date.now().toString(),
-      studentName: studentName,
-      certName: mappedCertName || cert.certName,
-      course: 'Microsoft Office',
-      classBatch: cert.classBatch,
-      timestamp: new Date().toISOString(),
-      read: false
-    });
-    await saveSheet('Notifications', notifs);
-
-    const students = await fetchSheet('Students');
-    const idx = students.findIndex(s => (s.fullName || '').trim().toLowerCase() === studentName.trim().toLowerCase());
-    if (idx !== -1) {
-      students[idx].downloadCount = (parseInt(students[idx].downloadCount) || 0) + 1;
-      await saveSheet('Students', students);
+// ===================== AUTO-LOGIN =====================
+(async function() {
+  const session = sessionStorage.getItem('mia_session');
+  if (session) {
+    try {
+      const s = JSON.parse(session);
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboardPage').style.display = 'block';
+      await initDashboard(s.username);
+    } catch(e) { sessionStorage.removeItem('mia_session'); }
+  }
+  document.querySelectorAll('.logo-img-wrap img').forEach(img => {
+    if (!img.complete || img.naturalWidth === 0) {
+      img.style.display = 'none';
+      img.nextElementSibling.style.display = 'flex';
     }
-  } catch(e) {
-    console.error("Could not sync download log to database.", e);
-  }
-}
-
-document.getElementById('nameInput').addEventListener('keydown', function (e) {
-  if (e.key === 'Enter') searchCertificate();
-});
-
-document.querySelectorAll('.logo-img-wrap img').forEach(img => {
-  if (!img.complete || img.naturalWidth === 0) {
-    img.style.display = 'none';
-    img.nextElementSibling.style.display = 'flex';
-  }
-});
+  });
+})();
 </script>
 </body>
 </html>
