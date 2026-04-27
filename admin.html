@@ -1009,7 +1009,8 @@ function handleStudentFile(file) {
           course:     String(r[colMap.course]     || '').trim(),
           classBatch: String(r[colMap.classBatch] || '').trim(),
           email:      String(r[colMap.email]      || '').trim(),
-          phone:      String(r[colMap.phone]      || '').trim()
+          phone:      String(r[colMap.phone]      || '').trim(),
+          manualCertId: ""
         }))
         .filter(s => s.fullName !== ''); // only keep rows that have a name
 
@@ -1082,7 +1083,7 @@ async function addStudentManually() {
   if (exists) { showToast('A student with this name already exists.', 'error'); return; }
 
   showLoader();
-  gStudents.push({ id: uid(), fullName, course, classBatch, email, phone, downloadCount: 0 });
+  gStudents.push({ id: uid(), fullName, course, classBatch, email, phone, downloadCount: 0, manualCertId: "" });
   await saveSheet('Students', gStudents);
   ['manFullName','manCourse','manBatch','manEmail','manPhone'].forEach(id => document.getElementById(id).value = '');
   showToast(`Student "${fullName}" added successfully!`, 'success');
@@ -1130,7 +1131,7 @@ async function saveManualAssign() {
   const studentIndex = gStudents.findIndex(s => s.id === studentId);
   
   if(studentIndex > -1) {
-    gStudents[studentIndex].manualCertId = certId || null;
+    gStudents[studentIndex].manualCertId = certId || "";
     showLoader();
     await saveSheet('Students', gStudents);
     renderStudentTable();
