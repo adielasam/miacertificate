@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Microsoft Imagine Academy — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- FIX #1: Switched from cdn.sheetjs.com (requires paid license, often fails) to unpkg which hosts the free community version -->
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -186,7 +185,6 @@ tr:hover td { background: var(--gray-50); }
 .form-group-dash input, .form-group-dash select, .form-group-dash textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-xs); font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--gray-800); background: var(--gray-50); outline: none; transition: all 0.15s; }
 .form-group-dash input:focus, .form-group-dash select:focus { border-color: var(--ms-green); background: white; box-shadow: 0 0 0 3px rgba(16,124,16,0.08); }
 
-/* FIX #2: Upload zone now has proper drag-over visual state via JS class toggling */
 .upload-zone { border: 2px dashed var(--gray-300); border-radius: var(--radius); padding: 40px 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--gray-50); }
 .upload-zone:hover, .upload-zone.drag-over { border-color: var(--ms-green); background: var(--ms-green-pale); }
 .upload-zone svg { width: 40px; height: 40px; fill: var(--gray-300); margin-bottom: 12px; }
@@ -195,7 +193,6 @@ tr:hover td { background: var(--gray-50); }
 .upload-zone p { font-size: 13px; color: var(--gray-400); }
 .upload-zone .accepted { font-size: 11px; color: var(--gray-400); margin-top: 8px; }
 
-/* Upload status banner shown inside the zone after file is selected */
 .upload-status { display: none; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-xs); margin-top: 12px; font-size: 13px; font-weight: 600; }
 .upload-status.show { display: flex; }
 .upload-status.processing { background: var(--info-bg); color: var(--info); }
@@ -296,7 +293,7 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
       <h2>Admin Dashboard</h2>
-      <p>Manage students, certificates, and track all certificate activity in one place securely linked to Google Sheets.</p>
+      <p>Manage students, certificates, course projects, and track activity securely linked to Google Sheets.</p>
       <div class="login-left-footer" style="margin-top:auto">
         <p>© Microsoft Imagine Academy</p>
       </div>
@@ -364,6 +361,10 @@ tr:hover td { background: var(--gray-50); }
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
         Register Certificates
       </button>
+      <button class="nav-item" onclick="showSection('projects', this)">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></span>
+        Manage Projects
+      </button>
       <div class="nav-section-label">Records</div>
       <button class="nav-item" onclick="showSection('studentRecords', this)">
         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.33C18 2.52 15.52 1 13 1c-1.4 0-2.71.59-3.71 1.57L8 3.86 6.71 2.57C5.71 1.59 4.4 1 3 1 .48 1 0 3.52 0 4.67 0 5.12.11 5.56.18 6H-2v2h22V6zm-5 2H9V6h6v2zM4 10v12h16V10H4zm8 11l-5-5 1.41-1.41L12 18.17l7.59-7.59L21 12l-9 9z"/></svg></span>
@@ -410,7 +411,6 @@ tr:hover td { background: var(--gray-50); }
 
     <div class="page-content">
 
-      <!-- DASHBOARD -->
       <div class="section active" id="sec-dashboard">
         <div class="stats-grid">
           <div class="stat-card">
@@ -444,7 +444,6 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-      <!-- UPLOAD STUDENTS -->
       <div class="section" id="sec-uploadStudents">
         <div class="card" style="margin-bottom:20px">
           <div class="card-header">
@@ -452,14 +451,12 @@ tr:hover td { background: var(--gray-50); }
             <h3>Upload Students from Excel or CSV</h3>
           </div>
           <div class="card-body">
-            <!-- FIX #3: Drop zone — drag events are now wired via JS in initDropZone() below -->
             <div class="upload-zone" id="studentDropZone" onclick="document.getElementById('studentFileInput').click()">
               <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
               <h4>Drop Excel or CSV File Here</h4>
               <p>or click to browse</p>
               <div class="accepted">Accepted: .xlsx &nbsp;·&nbsp; .xls &nbsp;·&nbsp; .csv</div>
             </div>
-            <!-- Status banner shown while parsing -->
             <div class="upload-status" id="uploadStatus"></div>
             <input type="file" id="studentFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleStudentFile(this.files[0])">
 
@@ -505,7 +502,6 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-      <!-- UPLOAD CERTS -->
       <div class="section" id="sec-uploadCerts">
         <div class="card" style="margin-bottom:20px;">
           <div class="card-header">
@@ -536,7 +532,42 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-      <!-- STUDENT RECORDS -->
+      <div class="section" id="sec-projects">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--ms-green)"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+            <h3>Upload Course Project</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group-dash"><label>Project Title *</label><input type="text" id="projTitle" placeholder="e.g. Final Web Project"></div>
+              <div class="form-group-dash"><label>Course *</label><input type="text" id="projCourse" placeholder="e.g. MS Word" list="coursesList"></div>
+              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="projBatch" placeholder="e.g. YEAR 9" list="batchesList"></div>
+              <div class="form-group-dash"><label>Document Link (Google Drive, GitHub, etc.) *</label><input type="url" id="projUrl" placeholder="https://..."></div>
+              <div class="form-group-dash" style="grid-column: 1/-1"><label>Description</label><textarea id="projDesc" rows="2" placeholder="Instructions..."></textarea></div>
+            </div>
+            <button class="btn btn-green" onclick="addProject()">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+              Add Project
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>All Projects</h3>
+            <span class="count-badge" id="projCountBadge">0</span>
+          </div>
+          <div class="card-body">
+             <div class="table-wrap">
+               <table id="projTable">
+                 <thead><tr><th>Title</th><th>Course</th><th>Batch</th><th>Link</th><th>Actions</th></tr></thead>
+                 <tbody id="projTbody"></tbody>
+               </table>
+             </div>
+          </div>
+        </div>
+      </div>
+
       <div class="section" id="sec-studentRecords">
         <div class="card">
           <div class="card-header" style="flex-wrap:wrap;">
@@ -563,7 +594,6 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-      <!-- CERT RECORDS -->
       <div class="section" id="sec-certRecords">
         <div class="card">
           <div class="card-header">
@@ -581,7 +611,6 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-      <!-- NOTIFICATIONS -->
       <div class="section" id="sec-notifications">
         <div class="card">
           <div class="card-header" style="flex-wrap:wrap;">
@@ -597,7 +626,6 @@ tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
-      <!-- SETTINGS -->
       <div class="section" id="sec-settings">
         <div class="card" style="max-width:540px; margin-bottom:20px;">
           <div class="card-header"><h3>Change Admin Credentials</h3></div>
@@ -627,7 +655,7 @@ tr:hover td { background: var(--gray-50); }
         <div class="card" style="max-width:540px; border:1px solid var(--error-border);">
           <div class="card-header"><h3 style="color:var(--error)">Danger Zone</h3></div>
           <div class="card-body">
-            <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">This will permanently delete all students, certificates, and notification records. This action cannot be undone.</p>
+            <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">This will permanently delete all students, certificates, projects, and notification records. This action cannot be undone.</p>
             <button class="btn btn-danger" onclick="resetAllData()">
               <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
               Reset All Data
@@ -647,6 +675,24 @@ tr:hover td { background: var(--gray-50); }
       <button class="modal-close" onclick="closeModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
     </div>
     <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="assignModalOverlay" class="modal-overlay" style="display:none" onclick="closeAssignModal(event)">
+  <div class="modal" id="assignModalBox" style="max-width: 450px;">
+    <div class="modal-header">
+      <h3>Manual Certificate Assignment</h3>
+      <button class="modal-close" onclick="closeAssignModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p id="assignStudentName" style="margin-bottom:16px;font-size:13px;color:var(--gray-600);"></p>
+      <input type="hidden" id="assignStudentId">
+      <div class="form-group-dash">
+        <label>Select Certificate</label>
+        <select id="assignCertSelect"></select>
+      </div>
+      <button class="btn btn-green" style="width:100%; justify-content:center; margin-top:8px;" onclick="saveManualAssign()">Save Assignment</button>
+    </div>
   </div>
 </div>
 
@@ -678,7 +724,7 @@ async function saveSheet(sheetName, data) {
   } catch(e) { console.error('DB save error:', e); }
 }
 
-let gStudents = [], gCerts = [], gNotifs = [];
+let gStudents = [], gCerts = [], gNotifs = [], gProjects = [];
 let pendingImport = [];
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
@@ -797,6 +843,7 @@ async function refreshDashboard() {
   gStudents = await fetchSheet('Students');
   gCerts = await fetchSheet('Certificates');
   gNotifs = await fetchSheet('Notifications');
+  gProjects = await fetchSheet('Projects');
 
   const unread = gNotifs.filter(n => !n.read).length;
   document.getElementById('statStudents').textContent = gStudents.length;
@@ -825,6 +872,7 @@ async function refreshDashboard() {
   }
 
   populateCoursesBatches();
+  renderProjTable();
   hideLoader();
 }
 
@@ -840,6 +888,7 @@ const sectionMeta = {
   dashboard: { title: 'Dashboard', sub: 'Overview of all activity' },
   uploadStudents: { title: 'Upload Students', sub: 'Import student records via Excel or manually' },
   uploadCerts: { title: 'Register Certificates', sub: 'Register certificate templates for courses' },
+  projects: { title: 'Course Projects', sub: 'Upload and manage project documents for students' },
   studentRecords: { title: 'Student Records', sub: 'Browse and manage all student records' },
   certRecords: { title: 'Certificate Records', sub: 'All registered certificate templates' },
   notifications: { title: 'Notifications', sub: 'Student certificate download activity' },
@@ -859,11 +908,10 @@ async function showSection(name, btn) {
   if (name === 'studentRecords') { renderStudentTable(); populateStudentFilters(); }
   if (name === 'certRecords') renderCertTable();
   if (name === 'notifications') renderNotifications();
-  if (name === 'uploadCerts') populateCoursesBatches();
+  if (name === 'uploadCerts' || name === 'projects') populateCoursesBatches();
 }
 
 // ===================== DROP ZONE SETUP =====================
-// FIX #4: Properly wire all drag events so drop actually works.
 function initDropZone() {
   const zone = document.getElementById('studentDropZone');
   if (!zone) return;
@@ -880,7 +928,7 @@ function initDropZone() {
   });
 }
 
-// ===================== FILE UPLOAD — FIXED CORE =====================
+// ===================== FILE UPLOAD =====================
 function setUploadStatus(type, msg) {
   const el = document.getElementById('uploadStatus');
   el.className = `upload-status show ${type}`;
@@ -895,14 +943,12 @@ function clearUploadStatus() {
 function handleStudentFile(file) {
   if (!file) return;
 
-  // FIX #5: Validate extension up front with a clear error
   const ext = file.name.split('.').pop().toLowerCase();
   if (!['xlsx', 'xls', 'csv'].includes(ext)) {
     setUploadStatus('err', `❌ Unsupported file type ".${ext}". Please upload .xlsx, .xls, or .csv`);
     return;
   }
 
-  // FIX #6: Check XLSX library loaded — guards against CDN timing issues
   if (typeof XLSX === 'undefined') {
     setUploadStatus('err', '❌ Spreadsheet library not loaded yet. Please wait a moment and try again.');
     return;
@@ -918,7 +964,6 @@ function handleStudentFile(file) {
 
   reader.onload = e => {
     try {
-      // FIX #7: Parse the workbook from ArrayBuffer (works for all: xlsx, xls, csv)
       const data = new Uint8Array(e.target.result);
       const wb = XLSX.read(data, {
         type: 'array',
@@ -932,7 +977,6 @@ function handleStudentFile(file) {
       }
 
       const ws = wb.Sheets[wb.SheetNames[0]];
-      // Use defval:'' so empty cells don't become undefined
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
 
       if (!rows || rows.length < 2) {
@@ -940,10 +984,8 @@ function handleStudentFile(file) {
         return;
       }
 
-      // FIX #8: Robust header mapping — strips BOM, trims whitespace, normalises to lowercase
       const rawHeaders = rows[0].map(h => String(h).replace(/^\uFEFF/, '').toLowerCase().trim());
 
-      // Build a flexible column map by scanning for keywords
       const colMap = { fullName: -1, course: -1, classBatch: -1, email: -1, phone: -1 };
 
       rawHeaders.forEach((h, i) => {
@@ -954,14 +996,12 @@ function handleStudentFile(file) {
         if (colMap.phone < 0    && (h.includes('phone') || h.includes('tel') || h.includes('mobile'))) colMap.phone = i;
       });
 
-      // Fall back to positional columns if headers weren't recognised at all
       if (colMap.fullName  < 0) colMap.fullName  = 0;
       if (colMap.course    < 0) colMap.course    = 1;
       if (colMap.classBatch< 0) colMap.classBatch= 2;
       if (colMap.email     < 0) colMap.email     = 3;
       if (colMap.phone     < 0) colMap.phone     = 4;
 
-      // FIX #9: Parse data rows, skipping the header and any fully empty rows
       pendingImport = rows.slice(1)
         .filter(r => Array.isArray(r) && r.some(cell => String(cell).trim() !== ''))
         .map(r => ({
@@ -994,23 +1034,18 @@ function handleStudentFile(file) {
       setUploadStatus('ready', `✅ ${pendingImport.length} student${pendingImport.length !== 1 ? 's' : ''} ready to import. Review below and click "Confirm Import".`);
 
     } catch (err) {
-      // FIX #10: Show the actual error message instead of a generic "check format"
       console.error('XLSX parse error:', err);
       setUploadStatus('err', `❌ Parse failed: ${err.message || err}. Try re-saving the file as .xlsx in Excel or Google Sheets and upload again.`);
     }
   };
-
-  // readAsArrayBuffer is correct and needed for SheetJS to handle all formats
   reader.readAsArrayBuffer(file);
 }
 
-// ===================== CONFIRM IMPORT — FIXED COUNT BUG =====================
 async function confirmImport() {
   if (!pendingImport.length) return;
   showLoader();
 
-  const importedCount = pendingImport.length; // capture before clearing
-  // FIX #11: Build the new combined array; add unique IDs and default downloadCount
+  const importedCount = pendingImport.length;
   const newStudents = pendingImport.map(s => ({ ...s, id: uid(), downloadCount: 0 }));
   const combined = [...gStudents, ...newStudents];
 
@@ -1022,7 +1057,6 @@ async function confirmImport() {
   clearUploadStatus();
   pendingImport = [];
 
-  // FIX #12: Use the captured count — no more double-counting arithmetic
   showToast(`${importedCount} student${importedCount !== 1 ? 's' : ''} imported successfully!`, 'success');
   await refreshDashboard();
   hideLoader();
@@ -1069,6 +1103,43 @@ async function deleteStudent(id) {
   showToast('Student deleted.', 'info');
 }
 
+// ===================== MANUAL ASSIGN =====================
+function openAssignModal(studentId) {
+  const student = gStudents.find(s => s.id === studentId);
+  if(!student) return;
+  document.getElementById('assignStudentId').value = student.id;
+  document.getElementById('assignStudentName').innerHTML = `Assign certificate to:<br><strong style="font-size:16px;color:var(--gray-800);">${escHtml(student.fullName)}</strong>`;
+  
+  const select = document.getElementById('assignCertSelect');
+  let opts = '<option value="">-- Remove Manual Assignment (Auto Match) --</option>';
+  gCerts.forEach(c => {
+     opts += `<option value="${c.id}" ${student.manualCertId === c.id ? 'selected' : ''}>${escHtml(c.certName)} (${escHtml(c.course)} - ${escHtml(c.classBatch)})</option>`;
+  });
+  select.innerHTML = opts;
+  document.getElementById('assignModalOverlay').style.display = 'flex';
+}
+
+function closeAssignModal(e) {
+  if (e && e.target !== document.getElementById('assignModalOverlay')) return;
+  document.getElementById('assignModalOverlay').style.display = 'none';
+}
+
+async function saveManualAssign() {
+  const studentId = document.getElementById('assignStudentId').value;
+  const certId = document.getElementById('assignCertSelect').value;
+  const studentIndex = gStudents.findIndex(s => s.id === studentId);
+  
+  if(studentIndex > -1) {
+    gStudents[studentIndex].manualCertId = certId || null;
+    showLoader();
+    await saveSheet('Students', gStudents);
+    renderStudentTable();
+    document.getElementById('assignModalOverlay').style.display = 'none';
+    hideLoader();
+    showToast('Assignment updated successfully!', 'success');
+  }
+}
+
 // ===================== STUDENT TABLE =====================
 function renderStudentTable() {
   const search      = (document.getElementById('studentSearch').value || '').toLowerCase();
@@ -1091,7 +1162,7 @@ function renderStudentTable() {
   }
 
   tbody.innerHTML = filtered.map((s, i) => {
-    const hasCert = gCerts.some(c =>
+    const hasCert = s.manualCertId ? gCerts.some(c => c.id === s.manualCertId) : gCerts.some(c =>
       c.course.toLowerCase() === (s.course || '').toLowerCase() &&
       c.classBatch.toLowerCase() === (s.classBatch || '').toLowerCase()
     );
@@ -1104,7 +1175,12 @@ function renderStudentTable() {
       <td>${escHtml(s.phone || '—')}</td>
       <td><span class="badge ${hasCert ? 'badge-green' : 'badge-gray'}">${hasCert ? 'Assigned' : 'Not Assigned'}</span></td>
       <td><span class="badge badge-blue">${s.downloadCount || 0}</span></td>
-      <td><button class="btn btn-danger btn-xs" onclick="deleteStudent('${s.id}')">Delete</button></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+            <button class="btn btn-outline btn-xs" onclick="openAssignModal('${s.id}')">Assign Cert</button>
+            <button class="btn btn-danger btn-xs" onclick="deleteStudent('${s.id}')">Delete</button>
+        </div>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -1129,6 +1205,57 @@ function exportStudentsCSV() {
   a.download = 'students.csv';
   a.click();
   showToast('Students exported to CSV.', 'success');
+}
+
+// ===================== PROJECTS =====================
+async function addProject() {
+  const title = document.getElementById('projTitle').value.trim();
+  const course = document.getElementById('projCourse').value.trim();
+  const batch = document.getElementById('projBatch').value.trim();
+  const url = document.getElementById('projUrl').value.trim();
+  const desc = document.getElementById('projDesc').value.trim();
+
+  if(!title || !course || !batch || !url) {
+      showToast('Title, Course, Batch, and Document Link are required.', 'error');
+      return;
+  }
+
+  showLoader();
+  gProjects.push({ id: uid(), title, course, classBatch: batch, fileUrl: url, description: desc, createdAt: new Date().toISOString() });
+  await saveSheet('Projects', gProjects);
+  
+  ['projTitle', 'projCourse', 'projBatch', 'projUrl', 'projDesc'].forEach(id => document.getElementById(id).value = '');
+  showToast('Project created successfully!', 'success');
+  renderProjTable();
+  hideLoader();
+}
+
+function renderProjTable() {
+  document.getElementById('projCountBadge').textContent = gProjects.length;
+  const tbody = document.getElementById('projTbody');
+  if(!gProjects.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:32px"><h4>No Projects</h4><p>Upload a course project template above.</p></div></td></tr>`;
+      return;
+  }
+  tbody.innerHTML = gProjects.map(p => `
+    <tr>
+      <td><strong>${escHtml(p.title)}</strong><br><span style="font-size:11px;color:var(--gray-400);">${escHtml(p.description).substring(0,30)}</span></td>
+      <td>${escHtml(p.course)}</td>
+      <td>${escHtml(p.classBatch)}</td>
+      <td><a href="${escHtml(p.fileUrl)}" target="_blank" style="color:var(--info);text-decoration:none;">View Link</a></td>
+      <td><button class="btn btn-danger btn-xs" onclick="deleteProject('${p.id}')">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+async function deleteProject(id) {
+  if(!confirm('Are you sure you want to delete this project?')) return;
+  showLoader();
+  gProjects = gProjects.filter(p => p.id !== id);
+  await saveSheet('Projects', gProjects);
+  renderProjTable();
+  hideLoader();
+  showToast('Project deleted successfully.', 'info');
 }
 
 // ===================== CERTIFICATE SAVE =====================
@@ -1266,12 +1393,13 @@ async function changeCredentials() {
 }
 
 async function resetAllData() {
-  if (!confirm('Are you absolutely sure? This will permanently delete ALL students, certificates, and notifications.')) return;
+  if (!confirm('Are you absolutely sure? This will permanently delete ALL students, certificates, projects, and notifications.')) return;
   if (!confirm('FINAL WARNING: Click OK to permanently erase all data.')) return;
   showLoader();
   await saveSheet('Students', []);
   await saveSheet('Certificates', []);
   await saveSheet('Notifications', []);
+  await saveSheet('Projects', []);
   await refreshDashboard();
   renderStudentTable();
   renderCertTable();
