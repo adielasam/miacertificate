@@ -28,6 +28,7 @@
     --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
     --shadow-lg: 0 10px 40px rgba(0,0,0,0.14);
     --radius: 16px;
+    --radius-sm: 10px;
   }
 
   html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; background: var(--gray-100); }
@@ -120,7 +121,7 @@
   .error-box p { font-size: 14px; color: #991b1b; line-height: 1.5; }
 
   /* MODALS */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
   .modal { background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
   .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 10; }
   .modal-header h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
@@ -305,7 +306,7 @@
 </div>
 
 <div id="projectsModalOverlay" class="modal-overlay" style="display:none" onclick="closeProjectsModal(event)">
-  <div class="modal" style="max-width: 700px; width:100%;">
+  <div class="modal" id="projectsModalBox" style="max-width: 700px; width:100%;">
     <div class="modal-header">
       <h3>All Course Projects</h3>
       <button class="modal-close" onclick="closeProjectsModal()">
@@ -328,8 +329,9 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDW7ODHwsLUleRQOBnd
 async function fetchSheet(sheetName) {
   try {
     const res = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
-    return await res.json();
-  } catch(e) { console.error("Database fetch error:", e); return []; }
+    const json = await res.json();
+    return Array.isArray(json) ? json : [];
+  } catch(e) { console.error('DB fetch error:', e); return []; }
 }
 
 async function saveSheet(sheetName, data) {
@@ -366,14 +368,18 @@ function showToast(message, type = 'info') {
   toast.className = `toast ${type}`;
   toast.innerHTML = `<span>${type==='error'?'✕':'✓'}</span><span>${message}</span>`;
   container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3500);
+  setTimeout(() => {
+    toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; 
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
 }
 
-function getInitials(name) { return (!name) ? '' : name.trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join(''); }
 function escHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function getInitials(name) { return (!name) ? '' : name.trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join(''); }
 function escapeAttr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
-// ===================== SEARCH =====================
+// ===================== SEARCH CERTIFICATE =====================
 async function searchCertificate() {
   const input = document.getElementById('nameInput').value.trim();
   const resultArea = document.getElementById('resultArea');
@@ -533,7 +539,12 @@ async function checkCbtExams() {
     const isValid = students.find(s => (s.fullName || '').trim().toLowerCase() === name.toLowerCase() && s.classBatch === batch);
     if (!isValid) { hideLoader(); showToast('Student not found in this class. Check your spelling.', 'error'); return; }
 
-    cbtExams = exams.filter(e => String(e.isLive).toLowerCase() === 'true' && e.classBatch === batch);
+    // UPDATED: Check if the student's batch is in the comma-separated list of assigned batches for the exam
+    cbtExams = exams.filter(e => {
+        if (String(e.isLive).toLowerCase() !== 'true') return false;
+        const examBatches = (e.classBatch || '').split(',').map(b => b.trim().toLowerCase());
+        return examBatches.includes(batch.trim().toLowerCase());
+    });
 
     const container = document.getElementById('cbtExamsContainer');
     if(cbtExams.length === 0) {
