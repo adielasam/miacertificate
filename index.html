@@ -352,7 +352,9 @@ async function fetchSheet(sheetName) {
     const text = await res.text();
     try {
         const json = JSON.parse(text);
-        return Array.isArray(json) ? json : [];
+        // FIX: Google Sheets often returns empty rows as nulls/empty objects. 
+        // We MUST filter them out, otherwise accessing properties on them causes TypeErrors.
+        return Array.isArray(json) ? json.filter(item => item !== null && typeof item === 'object' && Object.keys(item).length > 0) : [];
     } catch(err) {
         console.error("JSON Parse Error:", err);
         return [];
@@ -494,7 +496,8 @@ async function searchCertificate() {
     }
     resultArea.innerHTML = resultHtml;
   } catch (error) { 
-      showToast('Failed to connect to database. Please check your connection.', 'error'); 
+      console.error("Search Error:", error);
+      showToast('An error occurred during search. Please try again.', 'error'); 
   }
 
   btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Record`;
@@ -592,22 +595,26 @@ async function checkCbtExams() {
         const taken = results.find(r => r.studentName === cbtStudentData.name && String(r.examId) === String(ex.id));
         if (taken) {
           return `<div class="cbt-exam-card" style="opacity:0.6;">
-            <div><h4 style="color:var(--gray-600);">${escHtml(ex.title)}</h4><p>${escHtml(ex.course)}</p></div>
+            <div><h4 style="color:var(--gray-600);">${escapeHtml(ex.title)}</h4><p>${escapeHtml(ex.course)}</p></div>
             <span style="font-size:12px; font-weight:700; color:var(--success);">Already Completed</span>
           </div>`;
         }
         return `
         <div class="cbt-exam-card">
           <div>
-            <h4 style="font-size:15px; font-weight:700; color:var(--gray-800);">${escHtml(ex.title)}</h4>
-            <p style="font-size:12px; color:var(--gray-500);">${escHtml(ex.course)} • ${ex.duration || 30} mins</p>
+            <h4 style="font-size:15px; font-weight:700; color:var(--gray-800);">${escapeHtml(ex.title)}</h4>
+            <p style="font-size:12px; color:var(--gray-500);">${escapeHtml(ex.course)} • ${ex.duration || 30} mins</p>
           </div>
           <button class="btn-search" style="width:auto; padding:8px 16px; font-size:13px;" onclick="startCbtExam('${ex.id}')">Start Test</button>
         </div>`;
       }).join('');
     }
     showCbtScreen('cbtScreenList');
-  } catch (error) { showToast('Connection failed. Please check your internet.', 'error'); }
+  } catch (error) { 
+      console.error("CBT Check Error:", error); 
+      // Changed to a more accurate error message
+      showToast('An error occurred checking exams. Please try again.', 'error'); 
+  }
   hideLoader();
 }
 
@@ -665,13 +672,13 @@ function renderCbtQuestion() {
       <label class="cbt-option-row ${isSelected ? 'selected' : ''}" onclick="selectCbtOption('${letter}')">
         <div class="cbt-radio-circle"></div>
         <div class="cbt-opt-letter">${letter}</div> 
-        <div class="cbt-opt-text">${escHtml(optText)}</div>
+        <div class="cbt-opt-text">${escapeHtml(optText)}</div>
       </label>
     `;
   }).join('');
 
   container.innerHTML = `
-    <div class="cbt-question-text">${escHtml(q.question)}</div>
+    <div class="cbt-question-text">${escapeHtml(q.question)}</div>
     ${optionsHtml}
   `;
 
