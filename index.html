@@ -105,7 +105,7 @@
   .result-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
   .result-field label { display: block; font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
   .result-field span { font-size: 14px; font-weight: 600; color: var(--gray-800); }
-  .btn-download { width: 100%; padding: 14px; background: var(--ms-green); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-download { width: 100%; padding: 14px; background: var(--ms-green); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-download:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
   .btn-download:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
   .btn-download svg { width: 16px; height: 16px; fill: white; }
@@ -120,7 +120,6 @@
   .error-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: var(--radius-sm); padding: 18px 20px; display: flex; align-items: flex-start; gap: 12px; animation: slideIn 0.3s ease both; }
   .error-box svg { width: 20px; height: 20px; fill: var(--error); flex-shrink: 0; margin-top: 1px; }
   .error-box p { font-size: 14px; color: #991b1b; line-height: 1.5; }
-  .error-box strong { display: block; font-weight: 700; margin-bottom: 4px; }
 
   /* MODALS */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
@@ -157,7 +156,7 @@
   .cbt-nav-row { display: flex; justify-content: space-between; border-top: 1px solid var(--gray-200); padding-top: 20px; margin-top: 32px; }
 
   .cbt-score-display { text-align: center; padding: 30px 20px; }
-  .cbt-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--ms-green-pale); border: 4px solid var(--ms-green); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--ms-green-dark); margin: 0 auto 20px; }
+  .cbt-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--ms-green-pale); border: 4px solid var(--ms-green); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--ms-green-dark); margin: 0 auto 20px; transition: all 0.3s ease; }
 
   /* TOAST */
   .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
@@ -571,7 +570,6 @@ async function checkCbtExams() {
       container.innerHTML = `<div style="text-align:center; padding:30px; background:var(--gray-50); border-radius:12px; border:1px solid var(--gray-200);"><p style="color:var(--gray-500);">No live exams available for your class at this moment.</p></div>`;
     } else {
       container.innerHTML = cbtExams.map(ex => {
-        // Check if already taken
         const taken = results.find(r => r.studentName === name && String(r.examId) === String(ex.id));
         if (taken) {
           return `<div class="cbt-exam-card" style="opacity:0.6;">
@@ -626,7 +624,7 @@ function startCbtTimer(minutes) {
       const timerBox = document.getElementById('cbtTimerDisplay');
       timerBox.textContent = display;
 
-      if(timeRemaining <= 300) { timerBox.style.color = '#ff0000'; } // Turn red last 5 mins
+      if(timeRemaining <= 300) { timerBox.style.color = '#ff0000'; } 
       
       if (timeRemaining <= 0) {
           clearInterval(cbtTimerInterval);
@@ -689,41 +687,47 @@ async function finishCbtExam(isAutoSubmit = false) {
   
   clearInterval(cbtTimerInterval);
   showLoader("Grading Exam...");
-  let score = 0;
-  cbtQuestions.forEach((q, idx) => { if(cbtAnswers[idx] === q.answer) score++; });
-  const percentage = Math.round((score / cbtQuestions.length) * 100);
-  
-  const resultData = {
-    id: uid(),
-    studentName: cbtStudentData.name,
-    classBatch: cbtStudentData.batch,
-    examId: cbtCurrentExam.id,
-    examTitle: cbtCurrentExam.title,
-    score: score,
-    maxScore: cbtQuestions.length,
-    percentage: percentage,
-    timestamp: new Date().toISOString()
-  };
 
-  // UI UPDATE FIRST - FASTEST RESPONSE FOR STUDENT
-  document.getElementById('cbtFinalScore').textContent = score;
-  document.getElementById('cbtTotalScore').textContent = cbtQuestions.length;
-  document.getElementById('cbtFinalPercentage').textContent = `${percentage}%`;
-  document.getElementById('cbtFinalPercentage').style.color = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
-  document.getElementById('cbtFinalPercentage').style.borderColor = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
-
-  hideLoader();
-  showCbtScreen('cbtScreenResult');
-
-  // BACKGROUND DB SAVE - PREVENTS SLOW LOADER FREEZING
   try {
-    const results = await fetchSheet('CBT_Results');
-    const alreadyExists = results.find(r => r.studentName === cbtStudentData.name && String(r.examId) === String(cbtCurrentExam.id));
-    if (!alreadyExists) {
-        results.push(resultData);
-        await saveSheet('CBT_Results', results);
-    }
-  } catch(e) { console.error('Background save failed', e); }
+      let score = 0;
+      cbtQuestions.forEach((q, idx) => { if(cbtAnswers[idx] === q.answer) score++; });
+      const percentage = Math.round((score / cbtQuestions.length) * 100);
+      
+      const resultData = {
+        id: uid(),
+        studentName: cbtStudentData.name,
+        classBatch: cbtStudentData.batch,
+        examId: cbtCurrentExam.id,
+        examTitle: cbtCurrentExam.title,
+        score: score,
+        maxScore: cbtQuestions.length,
+        percentage: percentage,
+        timestamp: new Date().toISOString()
+      };
+
+      // FAST UI UPDATE
+      document.getElementById('cbtFinalScore').textContent = score;
+      document.getElementById('cbtTotalScore').textContent = cbtQuestions.length;
+      document.getElementById('cbtFinalPercentage').textContent = `${percentage}%`;
+      document.getElementById('cbtFinalPercentage').style.color = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
+      document.getElementById('cbtFinalPercentage').style.borderColor = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
+
+      hideLoader();
+      showCbtScreen('cbtScreenResult');
+
+      // SILENT BACKGROUND SAVE TO GOOGLE SHEETS
+      fetchSheet('CBT_Results').then(async (results) => {
+        const alreadyExists = results.find(r => r.studentName === cbtStudentData.name && String(r.examId) === String(cbtCurrentExam.id));
+        if (!alreadyExists) {
+            results.push(resultData);
+            await saveSheet('CBT_Results', results);
+        }
+      }).catch(e => console.error("Background save failed:", e));
+
+  } catch(err) {
+      hideLoader();
+      showToast('An error occurred during grading.', 'error');
+  }
 }
 
 // ===================== DOWNLOAD LOGIC =====================
