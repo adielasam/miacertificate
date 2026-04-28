@@ -884,7 +884,7 @@ function showToast(message, type = 'info', duration = 3500) {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   const icons = {
-    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`,
+    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`,
     error: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
     info: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`
   };
@@ -1084,17 +1084,12 @@ function handleExamFile(file) {
       const data = new Uint8Array(e.target.result);
       const wb = XLSX.read(data, { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
+      // Read Excel perfectly relying entirely on SheetJS
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
       
       if(rows.length < 2) { statusEl.textContent = '❌ File is empty.'; return; }
-      
-      let processedRows = rows;
-      // FALLBACK PARSER: If the file was saved badly and everything is in the first column
-      if (rows.length > 0 && rows[0].length === 1 && String(rows[0][0]).includes(',')) {
-         processedRows = rows.map(r => String(r[0]).split(',').map(s => s.replace(/^"|"$/g, '').trim()));
-      }
 
-      const headers = processedRows[0].map(h => String(h).toLowerCase().trim());
+      const headers = rows[0].map(h => String(h).toLowerCase().trim());
       const col = { q: -1, a: -1, b: -1, c: -1, d: -1, ans: -1 };
       
       headers.forEach((h, i) => {
@@ -1109,7 +1104,7 @@ function handleExamFile(file) {
       if(col.q < 0) col.q = 0; if(col.a < 0) col.a = 1; if(col.b < 0) col.b = 2; 
       if(col.c < 0) col.c = 3; if(col.d < 0) col.d = 4; if(col.ans < 0) col.ans = 5;
 
-      pendingExamQuestions = processedRows.slice(1).map(r => ({
+      pendingExamQuestions = rows.slice(1).map(r => ({
         question: String(r[col.q] || '').trim(),
         optA: String(r[col.a] || '').trim(),
         optB: String(r[col.b] || '').trim(),
@@ -1238,7 +1233,7 @@ function renderCbtResultsTable() {
       <td>${escHtml(r.examTitle)}</td>
       <td>${r.score} / ${r.maxScore}</td>
       <td><strong>${r.percentage}%</strong></td>
-      <td>${new Date(r.timestamp).toLocaleDateString()}</td>
+      <td>${r.timestamp ? new Date(r.timestamp).toLocaleDateString() : 'N/A'}</td>
     </tr>
   `).join('');
 }
