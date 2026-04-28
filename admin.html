@@ -606,6 +606,11 @@ input:checked + .slider:before { transform: translateX(20px); }
               </div>
 
               <div class="form-group-dash">
+                <label>Exam Duration (Minutes) *</label>
+                <input type="number" id="examDuration" placeholder="e.g. 30" value="30">
+              </div>
+
+              <div class="form-group-dash">
                 <label>Status</label>
                 <label class="switch">
                   <input type="checkbox" id="examLiveStatus">
@@ -638,7 +643,7 @@ input:checked + .slider:before { transform: translateX(20px); }
           <div class="card-body">
              <div class="table-wrap">
                <table id="examTable">
-                 <thead><tr><th>Title</th><th>Course</th><th>Assigned Batches</th><th>Questions</th><th>Live Status</th><th>Actions</th></tr></thead>
+                 <thead><tr><th>Title</th><th>Course</th><th>Assigned Batches</th><th>Time</th><th>Questions</th><th>Live Status</th><th>Actions</th></tr></thead>
                  <tbody id="examTbody"></tbody>
                </table>
              </div>
@@ -879,7 +884,7 @@ function showToast(message, type = 'info', duration = 3500) {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   const icons = {
-    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+    success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`,
     error: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
     info: `<svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`
   };
@@ -1083,7 +1088,13 @@ function handleExamFile(file) {
       
       if(rows.length < 2) { statusEl.textContent = '❌ File is empty.'; return; }
       
-      const headers = rows[0].map(h => String(h).toLowerCase().trim());
+      let processedRows = rows;
+      // FALLBACK PARSER: If the file was saved badly and everything is in the first column
+      if (rows.length > 0 && rows[0].length === 1 && String(rows[0][0]).includes(',')) {
+         processedRows = rows.map(r => String(r[0]).split(',').map(s => s.replace(/^"|"$/g, '').trim()));
+      }
+
+      const headers = processedRows[0].map(h => String(h).toLowerCase().trim());
       const col = { q: -1, a: -1, b: -1, c: -1, d: -1, ans: -1 };
       
       headers.forEach((h, i) => {
@@ -1098,7 +1109,7 @@ function handleExamFile(file) {
       if(col.q < 0) col.q = 0; if(col.a < 0) col.a = 1; if(col.b < 0) col.b = 2; 
       if(col.c < 0) col.c = 3; if(col.d < 0) col.d = 4; if(col.ans < 0) col.ans = 5;
 
-      pendingExamQuestions = rows.slice(1).map(r => ({
+      pendingExamQuestions = processedRows.slice(1).map(r => ({
         question: String(r[col.q] || '').trim(),
         optA: String(r[col.a] || '').trim(),
         optB: String(r[col.b] || '').trim(),
@@ -1129,6 +1140,7 @@ async function addExam() {
   const customBatches = document.getElementById('examBatchCustom').value.split(',').map(s => s.trim()).filter(Boolean);
   const allBatches = [...new Set([...selectedBatches, ...customBatches])];
   const batch = allBatches.join(', ');
+  const duration = document.getElementById('examDuration').value;
 
   const isLive = document.getElementById('examLiveStatus').checked;
   
@@ -1139,6 +1151,7 @@ async function addExam() {
   gExams.push({
     id: uid(),
     title, course, classBatch: batch,
+    duration: parseInt(duration) || 30,
     isLive: isLive,
     questions: JSON.stringify(pendingExamQuestions),
     createdAt: new Date().toISOString()
@@ -1146,7 +1159,7 @@ async function addExam() {
   
   await saveSheet('Exams', gExams);
   
-  ['examTitle','examCourse','examBatchCustom'].forEach(id => {
+  ['examTitle','examCourse','examBatchCustom','examDuration'].forEach(id => {
       const el = document.getElementById(id);
       if(el) el.value = '';
   });
@@ -1165,7 +1178,7 @@ function renderExamsTable() {
   document.getElementById('examCountBadge').textContent = gExams.length;
   const tbody = document.getElementById('examTbody');
   if(!gExams.length) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:32px"><h4>No Exams</h4><p>Create an exam above.</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state" style="padding:32px"><h4>No Exams</h4><p>Create an exam above.</p></div></td></tr>`;
     return;
   }
   tbody.innerHTML = gExams.map(ex => {
@@ -1175,6 +1188,7 @@ function renderExamsTable() {
       <td><strong>${escHtml(ex.title)}</strong></td>
       <td>${escHtml(ex.course)}</td>
       <td>${escHtml(ex.classBatch)}</td>
+      <td>${ex.duration || 30} mins</td>
       <td>${qCount} Qs</td>
       <td>
         <label class="switch">
