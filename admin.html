@@ -14,6 +14,7 @@
   --ms-green-dark: #0a5a0a;
   --ms-green-light: #16a016;
   --ms-green-pale: #e8f5e8;
+  --ms-green-mid: #1a8f1a;
   --white: #ffffff;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
@@ -593,7 +594,17 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div class="form-row">
               <div class="form-group-dash"><label>Exam Title *</label><input type="text" id="examTitle" placeholder="e.g. MS Word Final Exam"></div>
               <div class="form-group-dash"><label>Course *</label><input type="text" id="examCourse" placeholder="e.g. MS Word" list="coursesList"></div>
-              <div class="form-group-dash"><label>Class / Batch *</label><input type="text" id="examBatch" placeholder="e.g. Batch 2024-A" list="batchesList"></div>
+              
+              <div class="form-group-dash">
+                <label>Class / Batch * <span style="font-size:11px; font-weight:normal; color:var(--gray-500);">(Select multiple or type below)</span></label>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <div id="examBatchContainer" style="background:var(--gray-50); border:1px solid var(--gray-200); border-radius:var(--radius-xs); padding:10px 14px; max-height:120px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+                    <span style="font-size:12px; color:var(--gray-400);">Loading classes...</span>
+                  </div>
+                  <input type="text" id="examBatchCustom" placeholder="Or type manually (e.g. YEAR 7, YEAR 8)">
+                </div>
+              </div>
+
               <div class="form-group-dash">
                 <label>Status</label>
                 <label class="switch">
@@ -627,7 +638,7 @@ input:checked + .slider:before { transform: translateX(20px); }
           <div class="card-body">
              <div class="table-wrap">
                <table id="examTable">
-                 <thead><tr><th>Title</th><th>Course</th><th>Batch</th><th>Questions</th><th>Live Status</th><th>Actions</th></tr></thead>
+                 <thead><tr><th>Title</th><th>Course</th><th>Assigned Batches</th><th>Questions</th><th>Live Status</th><th>Actions</th></tr></thead>
                  <tbody id="examTbody"></tbody>
                </table>
              </div>
@@ -847,6 +858,7 @@ function timeAgo(ts) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+// ===================== PASSWORD TOGGLE =====================
 function togglePasswordVisibility(inputId, btn) {
   const input = document.getElementById(inputId);
   const icon = btn.querySelector('svg');
@@ -861,6 +873,7 @@ function togglePasswordVisibility(inputId, btn) {
   }
 }
 
+// ===================== TOAST =====================
 function showToast(message, type = 'info', duration = 3500) {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -878,6 +891,7 @@ function showToast(message, type = 'info', duration = 3500) {
   }, duration);
 }
 
+// ===================== MOBILE SIDEBAR =====================
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('active');
@@ -1001,6 +1015,20 @@ function populateCoursesBatches() {
   
   document.getElementById('coursesList').innerHTML = optsCourses;
   document.getElementById('batchesList').innerHTML = optsBatches;
+
+  // Populate Exam Multi-select container
+  const examBatchContainer = document.getElementById('examBatchContainer');
+  if (examBatchContainer) {
+      if (batches.length === 0) {
+          examBatchContainer.innerHTML = '<span style="font-size:12px; color:var(--gray-400);">No classes found yet. Type below.</span>';
+      } else {
+          examBatchContainer.innerHTML = batches.map((b, i) => `
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--gray-800); font-weight:500;">
+              <input type="checkbox" value="${escHtml(b)}" class="exam-batch-checkbox" style="width:auto; margin:0; accent-color:var(--ms-green);"> ${escHtml(b)}
+            </label>
+          `).join('');
+      }
+  }
 }
 
 // ===================== NAV =====================
@@ -1067,7 +1095,6 @@ function handleExamFile(file) {
         else if(h.includes('answer') || h === 'ans') col.ans = i;
       });
       
-      // Fallback
       if(col.q < 0) col.q = 0; if(col.a < 0) col.a = 1; if(col.b < 0) col.b = 2; 
       if(col.c < 0) col.c = 3; if(col.d < 0) col.d = 4; if(col.ans < 0) col.ans = 5;
 
@@ -1098,10 +1125,14 @@ function handleExamFile(file) {
 async function addExam() {
   const title = document.getElementById('examTitle').value.trim();
   const course = document.getElementById('examCourse').value.trim();
-  const batch = document.getElementById('examBatch').value.trim();
+  const selectedBatches = Array.from(document.querySelectorAll('.exam-batch-checkbox:checked')).map(cb => cb.value);
+  const customBatches = document.getElementById('examBatchCustom').value.split(',').map(s => s.trim()).filter(Boolean);
+  const allBatches = [...new Set([...selectedBatches, ...customBatches])];
+  const batch = allBatches.join(', ');
+
   const isLive = document.getElementById('examLiveStatus').checked;
   
-  if(!title || !course || !batch) { showToast('Title, Course, and Batch are required.', 'error'); return; }
+  if(!title || !course || allBatches.length === 0) { showToast('Title, Course, and at least one Batch are required.', 'error'); return; }
   if(!pendingExamQuestions || pendingExamQuestions.length === 0) { showToast('Please upload a valid questions file.', 'error'); return; }
 
   showLoader();
@@ -1115,7 +1146,11 @@ async function addExam() {
   
   await saveSheet('Exams', gExams);
   
-  ['examTitle','examCourse','examBatch'].forEach(id => document.getElementById(id).value = '');
+  ['examTitle','examCourse','examBatchCustom'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.value = '';
+  });
+  document.querySelectorAll('.exam-batch-checkbox').forEach(cb => cb.checked = false);
   document.getElementById('examLiveStatus').checked = false;
   document.getElementById('examQuestionsFile').value = '';
   document.getElementById('examFileStatus').textContent = '';
@@ -1459,8 +1494,8 @@ function renderStudentTable() {
 
   tbody.innerHTML = filtered.map((s, i) => {
     const hasCert = s.manualCertId ? gCerts.some(c => String(c.id) === String(s.manualCertId)) : gCerts.some(c =>
-      (c.course || '').toLowerCase() === (s.course || '').toLowerCase() &&
-      (c.classBatch || '').toLowerCase() === (s.classBatch || '').toLowerCase()
+      (c.course||'').toLowerCase() === (s.course || '').toLowerCase() &&
+      (c.classBatch||'').toLowerCase() === (s.classBatch || '').toLowerCase()
     );
     return `<tr>
       <td>${i + 1}</td>
