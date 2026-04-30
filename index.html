@@ -75,8 +75,8 @@
   .secret-admin-link:hover { color: rgba(255,255,255,0.8); }
 
   /* RIGHT PANEL */
-  .right-panel { flex: 1; background: var(--white); padding: 48px 48px; display: flex; flex-direction: column; justify-content: center; max-height: 100vh; overflow-y: auto; }
-  .right-header { margin-bottom: 36px; }
+  .right-panel { flex: 1; background: var(--white); padding: 48px 48px; display: flex; flex-direction: column; justify-content: flex-start; max-height: 100vh; overflow-y: auto; }
+  .right-header { margin-bottom: 24px; margin-top: 20px;}
   .right-header h2 { font-size: 28px; font-weight: 800; color: var(--gray-800); margin-bottom: 8px; }
   .right-header p { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
   .search-group { margin-bottom: 20px; }
@@ -132,31 +132,23 @@
   .modal-body { padding: 24px; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  /* ================== CBT MODAL STYLES ================== */
+  /* CBT MODAL STYLES */
   .cbt-screen { display: none; animation: fadeIn 0.3s ease; }
   .cbt-screen.active { display: block; }
-  
   .cbt-exam-card { border: 1px solid var(--gray-200); padding: 16px; border-radius: 12px; margin-bottom: 12px; background: var(--gray-50); display: flex; justify-content: space-between; align-items: center; }
-  
   .cbt-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gray-200); padding-bottom: 16px; margin-bottom: 24px; }
   .cbt-timer-box { background: #000; color: #ff3333; font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: bold; padding: 6px 12px; border-radius: 6px; letter-spacing: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
   .cbt-q-counter { font-size: 13px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-  
   .cbt-question-text { font-size: 18px; font-weight: 600; color: var(--gray-800); margin-bottom: 24px; line-height: 1.6; }
-  
   .cbt-option-row { display: flex; align-items: center; border: 1px solid var(--gray-300); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; cursor: pointer; transition: 0.2s; background: white; }
   .cbt-option-row:hover { border-color: var(--ms-green); }
   .cbt-option-row.selected { border-color: var(--ms-green); background: var(--ms-green-pale); }
-  
   .cbt-radio-circle { width: 20px; height: 20px; border: 2px solid var(--gray-400); border-radius: 50%; margin-right: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .cbt-option-row.selected .cbt-radio-circle { border-color: var(--ms-green); }
   .cbt-option-row.selected .cbt-radio-circle::after { content: ''; width: 10px; height: 10px; background: var(--ms-green); border-radius: 50%; }
-  
   .cbt-opt-letter { font-weight: 800; margin-right: 12px; color: var(--ms-green); width: 16px; font-size: 15px; }
   .cbt-opt-text { font-size: 15px; color: var(--gray-800); }
-  
   .cbt-nav-row { display: flex; justify-content: space-between; border-top: 1px solid var(--gray-200); padding-top: 20px; margin-top: 32px; }
-
   .cbt-score-display { text-align: center; padding: 30px 20px; }
   .cbt-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--ms-green-pale); border: 4px solid var(--ms-green); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--ms-green-dark); margin: 0 auto 20px; transition: all 0.3s ease; }
 
@@ -166,12 +158,30 @@
   .toast.error { background: var(--error); }
   @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
+  /* ================== ADBLOCKER-PROOF: SHOWCASE SLIDER & QUOTES ================== */
+  .featured-box { position: relative; width: 100%; height: 220px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); background: #111; margin-bottom: 20px; }
+  .featured-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
+  .featured-slide.active { opacity: 1; z-index: 2; }
+  .featured-slide img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; opacity: 0.65; transition: transform 6s linear; transform: scale(1.05); }
+  .featured-slide.active img { transform: scale(1); }
+  .featured-content { position: relative; z-index: 3; padding: 24px 28px; color: white; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%); width: 100%; border-bottom: 3px solid var(--ms-green); }
+  .featured-tag { font-size: 10px; font-weight: 800; background: var(--ms-green); padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 8px; }
+  .featured-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.2; }
+  .featured-desc { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  
+  .quotes-rotator { background: var(--ms-green-pale); border-left: 4px solid var(--ms-green); padding: 18px 24px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 36px; min-height: 84px; display: flex; align-items: center; position: relative; }
+  .quote-item { display: none; animation: fadeInQuote 0.6s ease; font-size: 15px; font-weight: 500; color: var(--ms-green-dark); line-height: 1.5; font-style: italic; }
+  .quote-item.active { display: block; }
+  .quote-author { display: block; font-size: 12px; font-weight: 800; color: var(--ms-green); margin-top: 6px; font-style: normal; text-transform: uppercase; letter-spacing: 0.05em; }
+  @keyframes fadeInQuote { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
   @media (max-width: 768px) {
     .portal-wrapper { flex-direction: column; border-radius: 20px; }
     .left-panel { width: 100%; min-width: 0; padding: 32px 24px; }
     .right-panel { padding: 32px 24px; }
     .result-fields { grid-template-columns: 1fr; }
     .contact-info { display: none; }
+    .featured-box { height: 180px; }
   }
 </style>
 </head>
@@ -222,6 +232,19 @@
   </div>
 
   <div class="right-panel">
+    
+    <!-- ================== NEW: ADBLOCKER-PROOF SHOWCASE SLIDER ================== -->
+    <h3 style="font-size: 16px; font-weight: 800; color: var(--ms-green); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">🏆 Featured Student Projects</h3>
+    
+    <div class="featured-box" id="featuredProjectsBox">
+      <div style="padding:24px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:600;">Loading Showcase...</div>
+    </div>
+    
+    <!-- ================== NEW: MOTIVATIONAL QUOTES ================== -->
+    <div class="quotes-rotator" id="quotesRotator">
+      <div class="quote-item active">"Loading inspiration..." <span class="quote-author"></span></div>
+    </div>
+
     <div class="right-header">
       <h2>Find Your Record</h2>
       <p>Enter your full name exactly as registered to locate your certificates and course projects.</p>
@@ -296,16 +319,11 @@
            </div>
            
            <div class="cbt-q-counter" id="cbtProgressTracker">QUESTION 1 OF X</div>
-           
            <div id="cbtQuestionContainer"></div>
            
            <div class="cbt-nav-row">
-               <button class="btn-outline-menu" id="cbtPrevBtn" style="width:auto; padding:10px 24px;" onclick="navigateCbt(-1)">
-                   &larr; Previous
-               </button>
-               <button class="btn-search" id="cbtNextBtn" style="width:auto; padding:10px 32px;" onclick="navigateCbt(1)">
-                   Next &rarr;
-               </button>
+               <button class="btn-outline-menu" id="cbtPrevBtn" style="width:auto; padding:10px 24px;" onclick="navigateCbt(-1)">&larr; Previous</button>
+               <button class="btn-search" id="cbtNextBtn" style="width:auto; padding:10px 32px;" onclick="navigateCbt(1)">Next &rarr;</button>
            </div>
        </div>
 
@@ -328,9 +346,7 @@
   <div class="modal" id="projectsModalBox" style="max-width: 700px; width:100%;">
     <div class="modal-header">
       <h3>All Course Projects</h3>
-      <button class="modal-close" onclick="closeProjectsModal()">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
+      <button class="modal-close" onclick="closeProjectsModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
     </div>
     <div class="modal-body">
        <div id="projectsLoading" style="text-align:center; padding:20px; color:var(--gray-500);">Loading projects...</div>
@@ -345,24 +361,17 @@
 // ===================== DATABASE CONFIG =====================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDW7ODHwsLUleRQOBndTVT_toClQnLytv5DHQzwF4ZIUOjwi5l12mnDIeDpnUteb-8/exec';
 
-// SUPER-ROBUST FETCH: Forces Google Sheets data into a clean, crash-proof array.
 async function fetchSheet(sheetName) {
   try {
     const res = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
     const text = await res.text();
     try {
         const json = JSON.parse(text);
-        // FIX: Google Sheets often returns empty rows as nulls/empty objects. 
-        // We MUST filter them out, otherwise accessing properties on them causes TypeErrors.
         return Array.isArray(json) ? json.filter(item => item !== null && typeof item === 'object' && Object.keys(item).length > 0) : [];
     } catch(err) {
-        console.error("JSON Parse Error:", err);
         return [];
     }
-  } catch(e) { 
-    console.error("Database fetch error:", e); 
-    return []; 
-  }
+  } catch(e) { return []; }
 }
 
 async function saveSheet(sheetName, data) {
@@ -392,7 +401,6 @@ function showLoader(msg = "Loading...") {
   document.getElementById('globalLoader').style.display = 'flex'; 
 }
 function hideLoader() { document.getElementById('globalLoader').style.display = 'none'; }
-
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -401,11 +409,78 @@ function showToast(message, type = 'info') {
   container.appendChild(toast);
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3500);
 }
-
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function getInitials(name) { return (!name) ? '' : String(name).trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join(''); }
 function escapeHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escapeAttr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+// ===================== ADBLOCKER-PROOF: SHOWCASE & QUOTES ENGINE =====================
+let showcaseSlideInterval, quotesInterval;
+let currentShowcaseSlide = 0, currentQuoteIndex = 0;
+
+const defaultQuotes = [
+  { text: "Technology is best when it brings people together.", author: "Matt Mullenweg" },
+  { text: "It's not that we use technology, we live technology.", author: "Godfrey Reggio" },
+  { text: "The Web as I envisaged it, we have not seen it yet. The future is still so much bigger than the past.", author: "Tim Berners-Lee" },
+  { text: "Make every minute count. The future of tech belongs to those who build it.", author: "MIACert Academy" },
+  { text: "Innovation is the outcome of a habit, not a random act.", author: "Sukant Ratnakar" },
+  { text: "Code is like humor. When you have to explain it, it’s bad.", author: "Cory House" }
+];
+
+const defaultProjects = [
+  { imgUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80", title: "Future of Computing", desc: "Top student exploration into cloud technologies." },
+  { imgUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80", title: "Data Structures", desc: "Award-winning algorithmic design project." },
+  { imgUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80", title: "Global Networks", desc: "Visualizing communication arrays securely." }
+];
+
+async function loadShowcaseData() {
+  try {
+    const [dbProjects, dbQuotes] = await Promise.all([ fetchSheet('TopProjects'), fetchSheet('Quotes') ]);
+    
+    // Render Slider
+    const projects = (dbProjects && dbProjects.length >= 3) ? dbProjects.slice(0,3) : defaultProjects;
+    const sliderContainer = document.getElementById('featuredProjectsBox');
+    sliderContainer.innerHTML = projects.map((p, i) => `
+      <div class="featured-slide ${i === 0 ? 'active' : ''}">
+        <img src="${escapeAttr(p.imgUrl)}" alt="Top Project" onerror="this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80'">
+        <div class="featured-content">
+          <div class="featured-tag">Project of the Month</div>
+          <div class="featured-title">${escapeHtml(p.title)}</div>
+          <div class="featured-desc">${escapeHtml(p.desc)}</div>
+        </div>
+      </div>
+    `).join('');
+
+    if(showcaseSlideInterval) clearInterval(showcaseSlideInterval);
+    showcaseSlideInterval = setInterval(() => {
+      const slides = document.querySelectorAll('.featured-slide');
+      if(!slides.length) return;
+      slides[currentShowcaseSlide].classList.remove('active');
+      currentShowcaseSlide = (currentShowcaseSlide + 1) % slides.length;
+      slides[currentShowcaseSlide].classList.add('active');
+    }, 4500);
+
+    // Render Quotes
+    const quotes = (dbQuotes && dbQuotes.length > 0) ? dbQuotes : defaultQuotes;
+    const quotesContainer = document.getElementById('quotesRotator');
+    quotesContainer.innerHTML = quotes.map((q, i) => `
+      <div class="quote-item ${i === 0 ? 'active' : ''}">
+        "${escapeHtml(q.text)}"
+        <span class="quote-author">— ${escapeHtml(q.author)}</span>
+      </div>
+    `).join('');
+
+    if(quotesInterval) clearInterval(quotesInterval);
+    quotesInterval = setInterval(() => {
+      const qSlides = document.querySelectorAll('.quote-item');
+      if(!qSlides.length) return;
+      qSlides[currentQuoteIndex].classList.remove('active');
+      currentQuoteIndex = (currentQuoteIndex + 1) % qSlides.length;
+      qSlides[currentQuoteIndex].classList.add('active');
+    }, 6000);
+
+  } catch(e) { console.error("Error loading showcase", e); }
+}
 
 // ===================== SEARCH CERTIFICATE =====================
 async function searchCertificate() {
@@ -422,7 +497,6 @@ async function searchCertificate() {
   try {
     const [students, certificates, projects] = await Promise.all([ fetchSheet('Students'), fetchSheet('Certificates'), fetchSheet('Projects') ]);
     
-    // SAFE PARSING: Force input and DB names to pure strings before calling .toLowerCase()
     const inputStr = String(input).toLowerCase();
     const student = students.find(s => String(s.fullName || '').trim().toLowerCase() === inputStr);
 
@@ -445,7 +519,6 @@ async function searchCertificate() {
     const targetCourse = cert ? String(cert.course) : String(student.course);
     const targetBatch = cert ? String(cert.classBatch) : String(student.classBatch);
     
-    // Strict string conversion for projects to prevent crashes
     const studentProjects = (Array.isArray(projects) ? projects : []).filter(p => 
       String(p.course || '').trim().toLowerCase() === targetCourse.trim().toLowerCase() &&
       String(p.classBatch || '').trim().toLowerCase() === targetBatch.trim().toLowerCase()
@@ -536,85 +609,40 @@ function closeProjectsModal(e) {
   document.getElementById('projectsModalOverlay').style.display = 'none';
 }
 
-
 // ===================== CBT ENGINE =====================
-let cbtExams = [];
-let cbtCurrentExam = null;
-let cbtCurrentIndex = 0;
-let cbtQuestions = [];
-let cbtAnswers = {};
-let cbtStudentData = { name: '', batch: '' };
-let cbtTimerInterval = null;
-
-function showCbtScreen(screenId) {
-  document.querySelectorAll('.cbt-screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
-}
-
-function openCbtModal() {
-  document.getElementById('cbtModalOverlay').style.display = 'flex';
-  showCbtScreen('cbtScreenLogin');
-}
-
-function closeCbtModal(e) {
-  if (e && e.target !== document.getElementById('cbtModalOverlay')) return;
-  clearInterval(cbtTimerInterval);
-  document.getElementById('cbtModalOverlay').style.display = 'none';
-  cbtCurrentExam = null; cbtQuestions = []; cbtAnswers = {};
-}
+let cbtExams = [], cbtCurrentExam = null, cbtCurrentIndex = 0, cbtQuestions = [], cbtAnswers = {}, cbtStudentData = { name: '', batch: '' }, cbtTimerInterval = null;
+function showCbtScreen(screenId) { document.querySelectorAll('.cbt-screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
+function openCbtModal() { document.getElementById('cbtModalOverlay').style.display = 'flex'; showCbtScreen('cbtScreenLogin'); }
+function closeCbtModal(e) { if (e && e.target !== document.getElementById('cbtModalOverlay')) return; clearInterval(cbtTimerInterval); document.getElementById('cbtModalOverlay').style.display = 'none'; cbtCurrentExam = null; cbtQuestions = []; cbtAnswers = {}; }
 
 async function checkCbtExams() {
   const name = document.getElementById('cbtNameInput').value.trim();
   if(!name) { showToast('Please enter your Full Name.', 'error'); return; }
-
   showLoader("Locating your profile...");
   try {
     const [students, exams, results] = await Promise.all([ fetchSheet('Students'), fetchSheet('Exams'), fetchSheet('CBT_Results') ]);
-    
-    // SAFE PARSING: Force to string before doing text operations
     const nameStr = String(name).toLowerCase();
     const student = students.find(s => String(s.fullName || '').trim().toLowerCase() === nameStr);
-    
     if (!student) { hideLoader(); showToast('Student record not found. Check your spelling.', 'error'); return; }
-
     const batch = String(student.classBatch || '');
     cbtStudentData.name = student.fullName;
     cbtStudentData.batch = batch;
-
     cbtExams = exams.filter(e => {
         if (String(e.isLive).toLowerCase() !== 'true') return false;
-        const examBatches = String(e.classBatch || '').split(',').map(b => b.trim().toLowerCase());
-        return examBatches.includes(batch.trim().toLowerCase());
+        return String(e.classBatch || '').split(',').map(b => b.trim().toLowerCase()).includes(batch.trim().toLowerCase());
     });
-
     const container = document.getElementById('cbtExamsContainer');
     if(cbtExams.length === 0) {
       container.innerHTML = `<div style="text-align:center; padding:30px; background:var(--gray-50); border-radius:12px; border:1px solid var(--gray-200);"><p style="color:var(--gray-500);">No live exams available for your class at this moment.</p></div>`;
     } else {
       container.innerHTML = cbtExams.map(ex => {
         const taken = results.find(r => r.studentName === cbtStudentData.name && String(r.examId) === String(ex.id));
-        if (taken) {
-          return `<div class="cbt-exam-card" style="opacity:0.6;">
-            <div><h4 style="color:var(--gray-600);">${escapeHtml(ex.title)}</h4><p>${escapeHtml(ex.course)}</p></div>
-            <span style="font-size:12px; font-weight:700; color:var(--success);">Already Completed</span>
-          </div>`;
-        }
-        return `
-        <div class="cbt-exam-card">
-          <div>
-            <h4 style="font-size:15px; font-weight:700; color:var(--gray-800);">${escapeHtml(ex.title)}</h4>
-            <p style="font-size:12px; color:var(--gray-500);">${escapeHtml(ex.course)} • ${ex.duration || 30} mins</p>
-          </div>
-          <button class="btn-search" style="width:auto; padding:8px 16px; font-size:13px;" onclick="startCbtExam('${ex.id}')">Start Test</button>
-        </div>`;
+        if (taken) { return `<div class="cbt-exam-card" style="opacity:0.6;"><div><h4 style="color:var(--gray-600);">${escapeHtml(ex.title)}</h4><p>${escapeHtml(ex.course)}</p></div><span style="font-size:12px; font-weight:700; color:var(--success);">Already Completed</span></div>`; }
+        return `<div class="cbt-exam-card"><div><h4 style="font-size:15px; font-weight:700; color:var(--gray-800);">${escapeHtml(ex.title)}</h4><p style="font-size:12px; color:var(--gray-500);">${escapeHtml(ex.course)} • ${ex.duration || 30} mins</p></div><button class="btn-search" style="width:auto; padding:8px 16px; font-size:13px;" onclick="startCbtExam('${ex.id}')">Start Test</button></div>`;
       }).join('');
     }
     showCbtScreen('cbtScreenList');
-  } catch (error) { 
-      console.error("CBT Check Error:", error); 
-      // Changed to a more accurate error message
-      showToast('An error occurred checking exams. Please try again.', 'error'); 
-  }
+  } catch (error) { showToast('An error occurred checking exams. Please try again.', 'error'); }
   hideLoader();
 }
 
@@ -623,12 +651,9 @@ window.startCbtExam = function(examId) {
   if(!cbtCurrentExam) return;
   try { cbtQuestions = JSON.parse(cbtCurrentExam.questions || '[]'); } catch(e) { showToast('Exam data is corrupted.', 'error'); return; }
   if(cbtQuestions.length === 0) { showToast('This exam has no questions.', 'error'); return; }
-
-  cbtAnswers = {};
-  cbtCurrentIndex = 0;
+  cbtAnswers = {}; cbtCurrentIndex = 0;
   document.getElementById('cbtExamActiveTitle').textContent = cbtCurrentExam.title;
   document.getElementById('cbtExamBadge').textContent = (cbtCurrentExam.course || 'EXAM').toUpperCase();
-  
   startCbtTimer(cbtCurrentExam.duration || 30);
   renderCbtQuestion();
   showCbtScreen('cbtScreenTake');
@@ -639,74 +664,36 @@ function startCbtTimer(minutes) {
   clearInterval(cbtTimerInterval);
   cbtTimerInterval = setInterval(() => {
       timeRemaining--;
-      let h = Math.floor(timeRemaining / 3600);
-      let m = Math.floor((timeRemaining % 3600) / 60);
-      let s = timeRemaining % 60;
-      
+      let h = Math.floor(timeRemaining / 3600), m = Math.floor((timeRemaining % 3600) / 60), s = timeRemaining % 60;
       let display = '';
       if(h > 0) display += String(h).padStart(2, '0') + ':';
       display += String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-      
       const timerBox = document.getElementById('cbtTimerDisplay');
       timerBox.textContent = display;
-
       if(timeRemaining <= 300) { timerBox.style.color = '#ff0000'; } 
-      
-      if (timeRemaining <= 0) {
-          clearInterval(cbtTimerInterval);
-          showToast("Time's up! Auto-submitting exam.", "error");
-          finishCbtExam(true);
-      }
+      if (timeRemaining <= 0) { clearInterval(cbtTimerInterval); showToast("Time's up! Auto-submitting exam.", "error"); finishCbtExam(true); }
   }, 1000);
 }
 
 function renderCbtQuestion() {
   const q = cbtQuestions[cbtCurrentIndex];
   const container = document.getElementById('cbtQuestionContainer');
-  
   const optionsHtml = ['A', 'B', 'C', 'D'].map(letter => {
     const optText = q['opt' + letter];
     if(!optText) return '';
     const isSelected = cbtAnswers[cbtCurrentIndex] === letter;
-    return `
-      <label class="cbt-option-row ${isSelected ? 'selected' : ''}" onclick="selectCbtOption('${letter}')">
-        <div class="cbt-radio-circle"></div>
-        <div class="cbt-opt-letter">${letter}</div> 
-        <div class="cbt-opt-text">${escapeHtml(optText)}</div>
-      </label>
-    `;
+    return `<label class="cbt-option-row ${isSelected ? 'selected' : ''}" onclick="selectCbtOption('${letter}')"><div class="cbt-radio-circle"></div><div class="cbt-opt-letter">${letter}</div> <div class="cbt-opt-text">${escapeHtml(optText)}</div></label>`;
   }).join('');
-
-  container.innerHTML = `
-    <div class="cbt-question-text">${escapeHtml(q.question)}</div>
-    ${optionsHtml}
-  `;
-
+  container.innerHTML = `<div class="cbt-question-text">${escapeHtml(q.question)}</div>${optionsHtml}`;
   document.getElementById('cbtProgressTracker').textContent = `QUESTION ${cbtCurrentIndex + 1} OF ${cbtQuestions.length}`;
-  
-  const prevBtn = document.getElementById('cbtPrevBtn');
-  const nextBtn = document.getElementById('cbtNextBtn');
-  
+  const prevBtn = document.getElementById('cbtPrevBtn'), nextBtn = document.getElementById('cbtNextBtn');
   prevBtn.style.visibility = cbtCurrentIndex === 0 ? 'hidden' : 'visible';
-  
-  if(cbtCurrentIndex === cbtQuestions.length - 1) {
-    nextBtn.innerHTML = 'Submit Exam';
-    nextBtn.style.background = 'var(--warning)';
-  } else {
-    nextBtn.innerHTML = 'Next &rarr;';
-    nextBtn.style.background = 'var(--ms-green)';
-  }
+  if(cbtCurrentIndex === cbtQuestions.length - 1) { nextBtn.innerHTML = 'Submit Exam'; nextBtn.style.background = 'var(--warning)'; } 
+  else { nextBtn.innerHTML = 'Next &rarr;'; nextBtn.style.background = 'var(--ms-green)'; }
 }
 
-window.selectCbtOption = function(letter) {
-  cbtAnswers[cbtCurrentIndex] = letter;
-  renderCbtQuestion(); 
-}
-
-window.navigateCbt = function(direction) {
-  if (direction === 1 && cbtCurrentIndex === cbtQuestions.length - 1) { finishCbtExam(); } 
-  else { cbtCurrentIndex += direction; renderCbtQuestion(); }
-}
+window.selectCbtOption = function(letter) { cbtAnswers[cbtCurrentIndex] = letter; renderCbtQuestion(); }
+window.navigateCbt = function(direction) { if (direction === 1 && cbtCurrentIndex === cbtQuestions.length - 1) { finishCbtExam(); } else { cbtCurrentIndex += direction; renderCbtQuestion(); } }
 
 async function executeCbtSave(resultData) {
     document.getElementById('cbtSaveStatus').textContent = "Saving to database... Please do not close window.";
@@ -714,8 +701,7 @@ async function executeCbtSave(resultData) {
     document.getElementById('cbtRetryBtn').style.display = "none";
     try {
         const results = await fetchSheet('CBT_Results');
-        const alreadyExists = results.find(r => r.studentName === resultData.studentName && String(r.examId) === String(resultData.examId));
-        if (!alreadyExists) {
+        if (!results.find(r => r.studentName === resultData.studentName && String(r.examId) === String(resultData.examId))) {
             results.push(resultData);
             await saveSheet('CBT_Results', results);
         }
@@ -728,119 +714,57 @@ async function executeCbtSave(resultData) {
     }
 }
 
-window.retrySaveCbt = function() {
-    if(window.lastCbtResult) executeCbtSave(window.lastCbtResult);
-}
+window.retrySaveCbt = function() { if(window.lastCbtResult) executeCbtSave(window.lastCbtResult); }
 
 function finishCbtExam(isAutoSubmit = false) {
   if(!isAutoSubmit && !confirm('Are you sure you want to submit your exam? You cannot change your answers after submitting.')) return;
-  
-  clearInterval(cbtTimerInterval);
-  showLoader("Grading Exam...");
-
-  // Delay calculation slightly so the loader can render
+  clearInterval(cbtTimerInterval); showLoader("Grading Exam...");
   setTimeout(() => {
       try {
-          let score = 0;
-          const totalQ = cbtQuestions.length || 1; 
-          cbtQuestions.forEach((q, idx) => { 
-              if(cbtAnswers[idx] && q.answer && String(cbtAnswers[idx]).trim().toUpperCase() === String(q.answer).trim().toUpperCase()) {
-                  score++; 
-              }
-          });
+          let score = 0; const totalQ = cbtQuestions.length || 1; 
+          cbtQuestions.forEach((q, idx) => { if(cbtAnswers[idx] && q.answer && String(cbtAnswers[idx]).trim().toUpperCase() === String(q.answer).trim().toUpperCase()) score++; });
           const percentage = Math.round((score / totalQ) * 100);
-          
-          window.lastCbtResult = {
-            id: uid(),
-            studentName: cbtStudentData.name,
-            classBatch: cbtStudentData.batch,
-            examId: cbtCurrentExam.id,
-            examTitle: cbtCurrentExam.title,
-            score: score,
-            maxScore: totalQ,
-            percentage: percentage,
-            timestamp: new Date().toISOString()
-          };
-
-          // FAST UI UPDATE: Instant feedback for student
+          window.lastCbtResult = { id: uid(), studentName: cbtStudentData.name, classBatch: cbtStudentData.batch, examId: cbtCurrentExam.id, examTitle: cbtCurrentExam.title, score: score, maxScore: totalQ, percentage: percentage, timestamp: new Date().toISOString() };
           document.getElementById('cbtFinalScore').textContent = score;
           document.getElementById('cbtTotalScore').textContent = totalQ;
           document.getElementById('cbtFinalPercentage').textContent = `${percentage}%`;
           document.getElementById('cbtFinalPercentage').style.color = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
           document.getElementById('cbtFinalPercentage').style.borderColor = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
-
-          hideLoader();
-          showCbtScreen('cbtScreenResult');
-
-          // SILENT BACKGROUND SAVE TO GOOGLE SHEETS
-          executeCbtSave(window.lastCbtResult);
-
-      } catch(err) {
-          hideLoader();
-          showToast('Grading Error: ' + err.message, 'error');
-      }
+          hideLoader(); showCbtScreen('cbtScreenResult'); executeCbtSave(window.lastCbtResult);
+      } catch(err) { hideLoader(); showToast('Grading Error: ' + err.message, 'error'); }
   }, 100);
 }
 
-// ===================== DOWNLOAD LOGIC =====================
 async function downloadCertificate(studentName, certId, mappedCertName) {
-  const btn = document.querySelector('.btn-download');
-  const origHTML = btn.innerHTML;
-  btn.innerHTML = '<div class="loading-spinner"></div> Preparing Download...';
-  btn.disabled = true;
-
+  const btn = document.querySelector('.btn-download'); const origHTML = btn.innerHTML;
+  btn.innerHTML = '<div class="loading-spinner"></div> Preparing Download...'; btn.disabled = true;
   try {
     const certificates = await fetchSheet('Certificates');
     const cert = certificates.find(c => String(c.id) === String(certId));
-
     if (!cert || !cert.fileData) { showToast('Certificate template not configured correctly.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; return; }
-
     if (cert.fileType === 'pdf') {
-      const link = document.createElement('a');
-      link.href = cert.fileData;
-      link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`;
-      link.click();
-      await logDownload(studentName, cert, mappedCertName);
-      showToast('Certificate downloaded successfully!', 'success');
-      btn.innerHTML = origHTML; btn.disabled = false;
+      const link = document.createElement('a'); link.href = cert.fileData; link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`; link.click();
+      await logDownload(studentName, cert, mappedCertName); showToast('Certificate downloaded successfully!', 'success'); btn.innerHTML = origHTML; btn.disabled = false;
     } else {
-      const img = new Image();
-      img.crossOrigin = "Anonymous"; 
-      
+      const img = new Image(); img.crossOrigin = "Anonymous"; 
       img.onload = async function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width; canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-
+        const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
+        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0);
         const fontSize = Math.max(48, Math.min(90, img.width / 14));
-        ctx.font = `bold ${fontSize}px 'Georgia', serif`; 
-        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#000000';
+        ctx.font = `bold ${fontSize}px 'Georgia', serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#000000';
         ctx.fillText(studentName, img.width / 2, img.height * 0.47);
-
         if (cert.dateIssued) {
-          const d = new Date(cert.dateIssued);
-          const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+          const dateStr = new Date(cert.dateIssued).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
           const dateFontSize = Math.max(20, Math.min(36, img.width / 30));
-          ctx.font = `${dateFontSize}px 'Georgia', serif`;
-          ctx.textAlign = 'left';
-          ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
+          ctx.font = `${dateFontSize}px 'Georgia', serif`; ctx.textAlign = 'left'; ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
         }
-
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`;
-        link.click();
-
-        await logDownload(studentName, cert, mappedCertName);
-        showToast('Certificate downloaded successfully!', 'success');
-        
-        btn.innerHTML = origHTML; btn.disabled = false;
+        const link = document.createElement('a'); link.href = canvas.toDataURL('image/png'); link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`; link.click();
+        await logDownload(studentName, cert, mappedCertName); showToast('Certificate downloaded successfully!', 'success'); btn.innerHTML = origHTML; btn.disabled = false;
       };
       img.onerror = function() { showToast('Error loading image from GitHub.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; };
       img.src = cert.fileData; 
     }
-  } catch (e) { console.error(e); showToast('Download failed. Check connection.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; }
+  } catch (e) { showToast('Download failed. Check connection.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; }
 }
 
 async function logDownload(studentName, cert, mappedCertName) {
@@ -848,7 +772,6 @@ async function logDownload(studentName, cert, mappedCertName) {
     const notifs = await fetchSheet('Notifications');
     notifs.unshift({ id: Date.now().toString(), studentName: studentName, certName: mappedCertName || cert.certName, course: 'Microsoft Office', classBatch: cert.classBatch, timestamp: new Date().toISOString(), read: false });
     await saveSheet('Notifications', notifs);
-
     const students = await fetchSheet('Students');
     const idx = students.findIndex(s => (s.fullName || '').trim().toLowerCase() === studentName.trim().toLowerCase());
     if (idx !== -1) { students[idx].downloadCount = (parseInt(students[idx].downloadCount) || 0) + 1; await saveSheet('Students', students); }
@@ -857,6 +780,11 @@ async function logDownload(studentName, cert, mappedCertName) {
 
 document.querySelectorAll('.logo-img-wrap img').forEach(img => {
   if (!img.complete || img.naturalWidth === 0) { img.style.display = 'none'; img.nextElementSibling.style.display = 'flex'; }
+});
+
+// START NEW LOGIC
+window.addEventListener('DOMContentLoaded', () => {
+  loadShowcaseData(); // Fetch slider and quotes on load
 });
 </script>
 </body>
