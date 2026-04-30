@@ -32,7 +32,6 @@
     --shadow-lg: 0 10px 40px rgba(0,0,0,0.14);
     --radius: 16px;
     --radius-sm: 10px;
-    /* Touch targets — min 44px per Apple/Google HIG */
     --touch-min: 48px;
   }
 
@@ -45,7 +44,6 @@
     font-family: 'Outfit', 'Segoe UI', sans-serif; 
     background: var(--gray-100); 
     min-height: 100vh;
-    /* Prevent horizontal scroll */
     overflow-x: hidden;
   }
 
@@ -193,7 +191,6 @@
     flex-direction: column; 
     justify-content: flex-start; 
     overflow-y: auto;
-    /* Smooth momentum scroll on iOS */
     -webkit-overflow-scrolling: touch;
   }
   .right-header { margin-bottom: 20px; margin-top: 16px; }
@@ -206,18 +203,16 @@
   .input-wrap { position: relative; }
   .input-wrap input, .input-wrap select { 
     width: 100%; 
-    /* Generous padding for touch — min height 48px */
     padding: 14px 18px 14px 48px; 
     min-height: var(--touch-min);
     border: 2px solid var(--gray-200); 
     border-radius: var(--radius-sm); 
-    font-size: 16px; /* 16px prevents iOS zoom on focus */
+    font-size: 16px;
     font-family: 'Outfit', sans-serif; 
     color: var(--gray-800); 
     background: var(--gray-50); 
     transition: all 0.2s ease; 
     outline: none;
-    /* Prevent iOS styling overrides */
     -webkit-appearance: none;
     appearance: none;
   }
@@ -255,7 +250,6 @@
     justify-content: center; 
     gap: 8px; 
     letter-spacing: 0.01em;
-    /* Remove tap highlight on mobile */
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
@@ -502,24 +496,22 @@
     background: rgba(0,0,0,0.6); 
     z-index: 1000; 
     display: flex; 
-    align-items: flex-end; /* Bottom sheet on mobile */
+    align-items: flex-end;
     justify-content: center; 
     padding: 0;
     animation: fadeIn 0.2s ease; 
   }
   .modal { 
     background: white; 
-    border-radius: var(--radius) var(--radius) 0 0; /* Bottom sheet style */
+    border-radius: var(--radius) var(--radius) 0 0;
     box-shadow: var(--shadow-lg); 
     width: 100%; 
     max-height: 92vh;
     overflow-y: auto; 
     position: relative;
     -webkit-overflow-scrolling: touch;
-    /* Pull handle visual */
     padding-top: 8px;
   }
-  /* Pull bar for bottom sheet */
   .modal::before {
     content: '';
     display: block;
@@ -723,7 +715,6 @@
 
   /* ===== RESPONSIVE BREAKPOINTS ===== */
 
-  /* Tablet */
   @media (max-width: 820px) {
     body { padding: 0; }
     .portal-wrapper { 
@@ -744,58 +735,44 @@
     .contact-info { display: none; }
     .left-footer { padding-top: 16px; }
     .mobile-contact-strip { display: flex; }
-
     .right-panel { 
       padding: 20px 16px 32px;
       flex: none;
     }
     .right-header h2 { font-size: 22px; }
-
-    /* Result fields — single column on small screens */
     .result-fields { grid-template-columns: 1fr; }
-
-    /* Action buttons stacked */
     .action-buttons-row { flex-direction: column !important; }
     .action-buttons-row .btn-outline-menu { flex: none !important; min-width: 0 !important; }
   }
 
-  /* Mobile (small phones) */
   @media (max-width: 480px) {
     .logo-area { gap: 10px; margin-bottom: 16px; }
     .logo-img-wrap { width: 44px; height: 44px; border-radius: 10px; }
     .logo-img-wrap img { width: 36px; height: 36px; }
     .brand-text h1 { font-size: 13px; }
-
-    /* Slider shorter on small screens */
     #stGallery { height: 170px !important; min-height: 170px !important; }
-
     .cbt-top-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
     .cbt-timer-box { font-size: 18px; }
     .cbt-question-text { font-size: 15px; }
     .cbt-nav-row { flex-direction: column-reverse; gap: 8px; }
     .cbt-nav-row .btn-outline-menu,
     .cbt-nav-row .btn-search { width: 100%; }
-
     .result-card { padding: 16px; }
     .result-card-header { gap: 10px; }
     .result-avatar { width: 44px; height: 44px; font-size: 16px; }
     .result-name { font-size: 15px; }
-
     .project-card { flex-direction: column; align-items: flex-start; }
     .btn-view-proj { width: 100%; justify-content: center; }
-
     .modal-body { padding: 16px; padding-bottom: 40px; }
     .modal-header { padding: 14px 16px; }
   }
 
-  /* Very small phones */
   @media (max-width: 360px) {
     .right-panel { padding: 16px 14px 24px; }
     .right-header h2 { font-size: 20px; }
     #stGallery { height: 150px !important; min-height: 150px !important; }
   }
 
-  /* Landscape mobile — limit left panel height */
   @media (max-width: 820px) and (orientation: landscape) {
     .left-panel { padding: 16px 20px; }
     .left-heading { font-size: 18px; }
@@ -803,7 +780,6 @@
     #stGallery { height: 160px !important; min-height: 160px !important; }
   }
 
-  /* Desktop modal centering (override bottom-sheet on large screens) */
   @media (min-width: 821px) {
     body { 
       display: flex; 
@@ -860,7 +836,6 @@
       <div class="divider"></div>
     </div>
 
-    <!-- Contact info — hidden on mobile (shown in strip below) -->
     <div class="contact-info">
       <div class="contact-item">
         <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
@@ -872,7 +847,6 @@
       </div>
     </div>
 
-    <!-- Mobile-only contact strip inside left panel -->
     <div class="mobile-contact-strip">
       <a href="tel:+2348162337303">
         <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
@@ -893,19 +867,16 @@
   <!-- ===== RIGHT PANEL ===== -->
   <div class="right-panel">
 
-    <!-- FEATURED PROJECTS SLIDER -->
     <h3 style="font-size:13px; font-weight:800; color:var(--ms-green); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.06em;">🏆 Featured Student Projects</h3>
 
     <div id="stGallery" style="display:block !important; visibility:visible !important; position:relative; width:100%; height:200px; min-height:200px; border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.1); background:#1a1a1a; margin-bottom:16px;">
       <div style="padding:20px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:600;">Loading Images...</div>
     </div>
 
-    <!-- MOTIVATIONAL QUOTES -->
     <div class="quotes-rotator" id="quotesRotator">
       <div class="quote-item active">"Loading inspiration..." <span class="quote-author"></span></div>
     </div>
 
-    <!-- SEARCH SECTION -->
     <div class="right-header">
       <h2>Find Your Record</h2>
       <p>Enter your full name exactly as registered to locate your certificates and course projects.</p>
@@ -1086,33 +1057,39 @@ function escapeHtml(str) { return String(str || '').replace(/&/g,'&amp;').replac
 function escapeAttr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
 /**
- * Converts any Google Drive sharing / open URL into a direct embeddable image URL.
- * Handles all common Drive link patterns:
- *   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
- *   https://drive.google.com/open?id=FILE_ID
- *   https://drive.google.com/uc?id=FILE_ID&export=view   (already direct — returned as-is)
- * Non-Drive URLs are returned unchanged.
+ * =====================================================================
+ * FIX: Convert any Google Drive sharing URL into a working image URL.
+ *
+ * The old `uc?export=view` endpoint was deprecated by Google in 2024.
+ * It now redirects through a virus-scan warning page that browsers block,
+ * so images would never load.
+ *
+ * The `thumbnail` endpoint works correctly — it serves the image directly,
+ * supports `sz=w800` for sizing, and has no CORS restrictions.
+ * =====================================================================
  */
 function toDirectImageUrl(url) {
   if (!url) return '';
   url = url.trim();
 
-  // Already a direct uc?export= link — leave it alone
-  if (url.includes('drive.google.com/uc')) return url;
+  let fileId = null;
 
-  // Pattern: /file/d/FILE_ID/
+  // Pattern 1: /file/d/FILE_ID/
   const fileIdMatch = url.match(/\/file\/d\/([^/?\s]+)/);
-  if (fileIdMatch) {
-    return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+  if (fileIdMatch) fileId = fileIdMatch[1];
+
+  // Pattern 2: ?id=FILE_ID or &id=FILE_ID  (open?id=, uc?id=, etc.)
+  if (!fileId) {
+    const idParamMatch = url.match(/[?&]id=([^&\s]+)/);
+    if (idParamMatch) fileId = idParamMatch[1];
   }
 
-  // Pattern: ?id=FILE_ID  (open?id= or uc?id=)
-  const idParamMatch = url.match(/[?&]id=([^&\s]+)/);
-  if (idParamMatch) {
-    return `https://drive.google.com/uc?export=view&id=${idParamMatch[1]}`;
+  // If we found a Drive file ID, use the thumbnail endpoint
+  if (fileId) {
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
   }
 
-  // Not a Drive link — return as-is
+  // Not a Drive link — return as-is (e.g. Unsplash, direct URLs)
   return url;
 }
 
@@ -1144,7 +1121,6 @@ async function loadShowcaseData() {
 
     const sliderContainer = document.getElementById('stGallery');
     sliderContainer.innerHTML = projectsToRender.map((p, i) => {
-      // Convert Google Drive sharing links → direct embeddable URLs
       const directUrl = toDirectImageUrl(p.imgUrl);
       return `
       <div class="st-slide ${i === 0 ? 'active' : ''}">
@@ -1276,7 +1252,6 @@ async function searchCertificate() {
 
     resultArea.innerHTML = resultHtml;
 
-    // Scroll to results on mobile
     if (window.innerWidth <= 820) {
       setTimeout(() => resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     }
