@@ -1085,6 +1085,37 @@ function getInitials(name) { return (!name) ? '' : String(name).trim().split(' '
 function escapeHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escapeAttr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
+/**
+ * Converts any Google Drive sharing / open URL into a direct embeddable image URL.
+ * Handles all common Drive link patterns:
+ *   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+ *   https://drive.google.com/open?id=FILE_ID
+ *   https://drive.google.com/uc?id=FILE_ID&export=view   (already direct — returned as-is)
+ * Non-Drive URLs are returned unchanged.
+ */
+function toDirectImageUrl(url) {
+  if (!url) return '';
+  url = url.trim();
+
+  // Already a direct uc?export= link — leave it alone
+  if (url.includes('drive.google.com/uc')) return url;
+
+  // Pattern: /file/d/FILE_ID/
+  const fileIdMatch = url.match(/\/file\/d\/([^/?\s]+)/);
+  if (fileIdMatch) {
+    return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+  }
+
+  // Pattern: ?id=FILE_ID  (open?id= or uc?id=)
+  const idParamMatch = url.match(/[?&]id=([^&\s]+)/);
+  if (idParamMatch) {
+    return `https://drive.google.com/uc?export=view&id=${idParamMatch[1]}`;
+  }
+
+  // Not a Drive link — return as-is
+  return url;
+}
+
 // ===================== SHOWCASE & QUOTES =====================
 let showcaseSlideInterval, quotesInterval;
 let currentShowcaseSlide = 0, currentQuoteIndex = 0;
@@ -1112,16 +1143,20 @@ async function loadShowcaseData() {
     const projectsToRender = validProjects.length >= 1 ? validProjects.slice(0, 3) : defaultProjects;
 
     const sliderContainer = document.getElementById('stGallery');
-    sliderContainer.innerHTML = projectsToRender.map((p, i) => `
+    sliderContainer.innerHTML = projectsToRender.map((p, i) => {
+      // Convert Google Drive sharing links → direct embeddable URLs
+      const directUrl = toDirectImageUrl(p.imgUrl);
+      return `
       <div class="st-slide ${i === 0 ? 'active' : ''}">
-        <img src="${escapeAttr(p.imgUrl)}" alt="Top Project" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80'">
+        <img src="${escapeAttr(directUrl)}" alt="Top Project" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80'">
         <div class="st-content">
           <div class="st-tag">Project of the Month</div>
           <div class="st-title">${escapeHtml(p.title || 'Student Project')}</div>
           <div class="st-desc">${escapeHtml(p.desc || 'Explore amazing projects.')}</div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
 
     if(showcaseSlideInterval) clearInterval(showcaseSlideInterval);
     showcaseSlideInterval = setInterval(() => {
