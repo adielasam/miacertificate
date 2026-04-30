@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Microsoft Imagine Academy — Student Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -18,38 +18,134 @@
     --gray-400: #94a3b8;
     --gray-500: #64748b;
     --gray-600: #475569;
+    --gray-700: #334155;
     --gray-800: #1e293b;
     --error: #dc2626;
     --error-bg: #fef2f2;
     --error-border: #fecaca;
     --warning: #d97706;
+    --success: #16a34a;
     --info: #0369a1;
     --info-bg: #eff6ff;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
     --shadow-lg: 0 10px 40px rgba(0,0,0,0.14);
     --radius: 16px;
     --radius-sm: 10px;
+    /* Touch targets — min 44px per Apple/Google HIG */
+    --touch-min: 48px;
   }
 
-  html, body { height: 100%; font-family: 'Outfit', 'Segoe UI', sans-serif; background: var(--gray-100); }
-  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+  html { 
+    height: 100%; 
+    -webkit-text-size-adjust: 100%; 
+    scroll-behavior: smooth;
+  }
+  body { 
+    font-family: 'Outfit', 'Segoe UI', sans-serif; 
+    background: var(--gray-100); 
+    min-height: 100vh;
+    /* Prevent horizontal scroll */
+    overflow-x: hidden;
+  }
 
-  #globalLoader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 99999; align-items: center; justify-content: center; flex-direction: column; }
-  .loader-circle { width: 48px; height: 48px; border: 4px solid var(--ms-green-pale); border-top-color: var(--ms-green); border-radius: 50%; animation: spin 1s linear infinite; }
+  /* ===== GLOBAL LOADER ===== */
+  #globalLoader { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(255,255,255,0.9); 
+    z-index: 99999; 
+    align-items: center; 
+    justify-content: center; 
+    flex-direction: column; 
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .loader-circle { 
+    width: 48px; height: 48px; 
+    border: 4px solid var(--ms-green-pale); 
+    border-top-color: var(--ms-green); 
+    border-radius: 50%; 
+    animation: spin 1s linear infinite; 
+  }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loader-text { margin-top: 16px; font-size: 14px; font-weight: 700; color: var(--ms-green-dark); }
+  .loader-text { 
+    margin-top: 16px; 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: var(--ms-green-dark); 
+  }
 
-  .portal-wrapper { display: flex; width: 100%; max-width: 1000px; min-height: 600px; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-lg); animation: fadeUp 0.6s ease both; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  /* ===== PORTAL LAYOUT ===== */
+  .portal-wrapper { 
+    display: flex; 
+    flex-direction: row;
+    width: 100%; 
+    max-width: 1000px; 
+    min-height: 600px; 
+    margin: 0 auto;
+    border-radius: 24px; 
+    overflow: hidden; 
+    box-shadow: var(--shadow-lg); 
+    animation: fadeUp 0.6s ease both; 
+  }
+  @keyframes fadeUp { 
+    from { opacity: 0; transform: translateY(24px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
 
-  /* LEFT PANEL */
-  .left-panel { width: 380px; min-width: 320px; background: var(--ms-green); color: white; padding: 48px 36px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-  .left-panel::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 50%); pointer-events: none; }
-  .left-panel::after { content: ''; position: absolute; bottom: -60px; right: -60px; width: 240px; height: 240px; border: 2px solid rgba(255,255,255,0.08); border-radius: 50%; pointer-events: none; }
-  .dot-grid { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; }
+  /* ===== LEFT PANEL ===== */
+  .left-panel { 
+    width: 340px; 
+    min-width: 300px;
+    background: var(--ms-green); 
+    color: white; 
+    padding: 40px 32px; 
+    display: flex; 
+    flex-direction: column; 
+    position: relative; 
+    overflow: hidden; 
+  }
+  .left-panel::before { 
+    content: ''; 
+    position: absolute; inset: 0; 
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, transparent 50%), 
+                radial-gradient(circle at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 50%); 
+    pointer-events: none; 
+  }
+  .left-panel::after { 
+    content: ''; 
+    position: absolute; bottom: -60px; right: -60px; 
+    width: 240px; height: 240px; 
+    border: 2px solid rgba(255,255,255,0.08); 
+    border-radius: 50%; 
+    pointer-events: none; 
+  }
+  .dot-grid { 
+    position: absolute; inset: 0; 
+    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px); 
+    background-size: 24px 24px; 
+    pointer-events: none; 
+  }
   .brand-section { position: relative; z-index: 1; }
-  .logo-area { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
-  .logo-img-wrap { width: 52px; height: 52px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .logo-area { 
+    display: flex; 
+    align-items: center; 
+    gap: 14px; 
+    margin-bottom: 28px; 
+  }
+  .logo-img-wrap { 
+    width: 52px; height: 52px; 
+    background: white; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    overflow: hidden; 
+    flex-shrink: 0; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+  }
   .logo-img-wrap img { width: 44px; height: 44px; object-fit: contain; }
   .logo-fallback { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
   .ms-squares { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 32px; height: 32px; }
@@ -61,127 +157,675 @@
   .brand-text h1 { font-size: 15px; font-weight: 700; line-height: 1.2; color: white; }
   .brand-text span { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.75); }
   .left-heading { font-size: 26px; font-weight: 800; line-height: 1.25; margin-bottom: 10px; color: white; }
-  .left-sub { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.78); line-height: 1.6; margin-bottom: 36px; }
-  .divider { height: 1px; background: rgba(255,255,255,0.18); margin-bottom: 28px; }
+  .left-sub { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.78); line-height: 1.6; margin-bottom: 28px; }
+  .divider { height: 1px; background: rgba(255,255,255,0.18); margin-bottom: 24px; }
   .contact-info { position: relative; z-index: 1; }
   .contact-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
-  .contact-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.12); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-icon { 
+    width: 32px; height: 32px; 
+    background: rgba(255,255,255,0.12); 
+    border-radius: 8px; 
+    display: flex; align-items: center; justify-content: center; 
+    flex-shrink: 0; 
+  }
   .contact-icon svg { width: 15px; height: 15px; fill: white; opacity: 0.9; }
   .contact-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
   .contact-value { font-size: 13px; color: rgba(255,255,255,0.88); line-height: 1.4; }
-  .left-footer { margin-top: auto; position: relative; z-index: 1; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: space-between; }
+  .left-footer { 
+    margin-top: auto; 
+    position: relative; z-index: 1; 
+    padding-top: 24px; 
+    border-top: 1px solid rgba(255,255,255,0.12); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+  }
   .left-footer p { font-size: 11px; color: rgba(255,255,255,0.45); margin: 0; }
   .secret-admin-link { font-size: 11px; color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.2s; }
   .secret-admin-link:hover { color: rgba(255,255,255,0.8); }
 
-  /* RIGHT PANEL */
-  .right-panel { flex: 1; background: var(--white); padding: 48px 48px; display: flex; flex-direction: column; justify-content: flex-start; max-height: 100vh; overflow-y: auto; }
-  .right-header { margin-bottom: 24px; margin-top: 20px;}
-  .right-header h2 { font-size: 28px; font-weight: 800; color: var(--gray-800); margin-bottom: 8px; }
+  /* ===== RIGHT PANEL ===== */
+  .right-panel { 
+    flex: 1; 
+    background: var(--white); 
+    padding: 40px 40px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-start; 
+    overflow-y: auto;
+    /* Smooth momentum scroll on iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+  .right-header { margin-bottom: 20px; margin-top: 16px; }
+  .right-header h2 { font-size: 26px; font-weight: 800; color: var(--gray-800); margin-bottom: 8px; }
   .right-header p { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
-  .search-group { margin-bottom: 20px; }
+
+  /* ===== FORM ELEMENTS ===== */
+  .search-group { margin-bottom: 16px; }
   .search-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-800); margin-bottom: 8px; }
   .input-wrap { position: relative; }
-  .input-wrap input, .input-wrap select { width: 100%; padding: 14px 18px 14px 48px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 15px; font-family: 'Outfit', sans-serif; color: var(--gray-800); background: var(--gray-50); transition: all 0.2s ease; outline: none; }
-  .input-wrap input:focus, .input-wrap select:focus { border-color: var(--ms-green); background: white; box-shadow: 0 0 0 4px rgba(16,124,16,0.1); }
+  .input-wrap input, .input-wrap select { 
+    width: 100%; 
+    /* Generous padding for touch — min height 48px */
+    padding: 14px 18px 14px 48px; 
+    min-height: var(--touch-min);
+    border: 2px solid var(--gray-200); 
+    border-radius: var(--radius-sm); 
+    font-size: 16px; /* 16px prevents iOS zoom on focus */
+    font-family: 'Outfit', sans-serif; 
+    color: var(--gray-800); 
+    background: var(--gray-50); 
+    transition: all 0.2s ease; 
+    outline: none;
+    /* Prevent iOS styling overrides */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .input-wrap input:focus, .input-wrap select:focus { 
+    border-color: var(--ms-green); 
+    background: white; 
+    box-shadow: 0 0 0 4px rgba(16,124,16,0.1); 
+  }
   .input-wrap input::placeholder { color: var(--gray-400); }
-  .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+  .input-icon { 
+    position: absolute; 
+    left: 15px; top: 50%; 
+    transform: translateY(-50%); 
+    color: var(--gray-400); 
+    pointer-events: none;
+  }
   .input-icon svg { width: 18px; height: 18px; fill: currentColor; }
-  .btn-search { width: 100%; padding: 15px; background: var(--ms-green); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.01em; }
+
+  /* ===== BUTTONS ===== */
+  .btn-search { 
+    width: 100%; 
+    padding: 15px; 
+    min-height: var(--touch-min);
+    background: var(--ms-green); 
+    color: white; 
+    border: none; 
+    border-radius: var(--radius-sm); 
+    font-size: 15px; 
+    font-weight: 700; 
+    font-family: 'Outfit', sans-serif; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px; 
+    letter-spacing: 0.01em;
+    /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   .btn-search:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
+  .btn-search:active { transform: translateY(0); box-shadow: none; opacity: 0.9; }
   .btn-search:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
-  .btn-search svg { width: 18px; height: 18px; fill: white; }
-  .btn-outline-menu { width: 100%; padding: 15px; background: white; color: var(--gray-700); border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-search svg { width: 18px; height: 18px; fill: white; flex-shrink: 0; }
+
+  .btn-outline-menu { 
+    width: 100%; 
+    padding: 14px; 
+    min-height: var(--touch-min);
+    background: white; 
+    color: var(--gray-700); 
+    border: 2px solid var(--gray-200); 
+    border-radius: var(--radius-sm); 
+    font-size: 14px; 
+    font-weight: 700; 
+    font-family: 'Outfit', sans-serif; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   .btn-outline-menu:hover { border-color: var(--ms-green); color: var(--ms-green); background: var(--ms-green-pale); }
+  .btn-outline-menu:active { opacity: 0.85; }
 
-  /* RESULT AREA */
-  .result-area { margin-top: 28px; }
-  .result-card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 28px; animation: slideIn 0.4s ease both; }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  .result-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--gray-200); }
-  .result-avatar { width: 52px; height: 52px; background: var(--ms-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; flex-shrink: 0; }
-  .result-name { font-size: 18px; font-weight: 700; color: var(--gray-800); }
-  .result-badge { display: inline-block; background: var(--ms-green-pale); color: var(--ms-green-dark); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 4px; letter-spacing: 0.04em; }
-  .result-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
-  .result-field label { display: block; font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
-  .result-field span { font-size: 14px; font-weight: 600; color: var(--gray-800); }
-  .btn-download { width: 100%; padding: 14px; background: var(--ms-green); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  /* ===== RESULT CARD ===== */
+  .result-area { margin-top: 24px; }
+  .result-card { 
+    background: var(--gray-50); 
+    border: 1px solid var(--gray-200); 
+    border-radius: var(--radius); 
+    padding: 24px; 
+    animation: slideIn 0.4s ease both; 
+  }
+  @keyframes slideIn { 
+    from { opacity: 0; transform: translateY(12px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
+  .result-card-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 14px; 
+    margin-bottom: 18px; 
+    padding-bottom: 18px; 
+    border-bottom: 1px solid var(--gray-200); 
+  }
+  .result-avatar { 
+    width: 52px; height: 52px; 
+    background: var(--ms-green); 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; justify-content: center; 
+    font-size: 18px; 
+    font-weight: 700; 
+    color: white; 
+    flex-shrink: 0; 
+  }
+  .result-name { font-size: 17px; font-weight: 700; color: var(--gray-800); }
+  .result-badge { 
+    display: inline-block; 
+    background: var(--ms-green-pale); 
+    color: var(--ms-green-dark); 
+    font-size: 11px; 
+    font-weight: 600; 
+    padding: 3px 10px; 
+    border-radius: 20px; 
+    margin-top: 4px; 
+    letter-spacing: 0.04em; 
+  }
+  .result-fields { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 14px; 
+    margin-bottom: 20px; 
+  }
+  .result-field label { 
+    display: block; 
+    font-size: 11px; 
+    font-weight: 600; 
+    color: var(--gray-400); 
+    text-transform: uppercase; 
+    letter-spacing: 0.07em; 
+    margin-bottom: 4px; 
+  }
+  .result-field span { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+
+  .btn-download { 
+    width: 100%; 
+    padding: 14px; 
+    min-height: var(--touch-min);
+    background: var(--ms-green); 
+    color: white; 
+    border: none; 
+    border-radius: var(--radius-sm); 
+    font-size: 14px; 
+    font-weight: 700; 
+    font-family: 'Outfit', sans-serif; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    display: flex; 
+    align-items: center; justify-content: center; 
+    gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   .btn-download:hover { background: var(--ms-green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,124,16,0.35); }
+  .btn-download:active { transform: none; opacity: 0.9; }
   .btn-download:disabled { background: var(--gray-400); cursor: not-allowed; box-shadow: none; transform: none; }
-  .btn-download svg { width: 16px; height: 16px; fill: white; }
+  .btn-download svg { width: 16px; height: 16px; fill: white; flex-shrink: 0; }
 
-  /* PROJECTS AREA */
-  .project-card { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
-  .project-info h4 { font-size: 15px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
-  .project-info p { font-size: 13px; color: var(--gray-500); line-height: 1.4; }
-  .btn-view-proj { background: var(--info-bg); color: var(--info); border: 1px solid rgba(3,105,161,0.2); padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; transition: 0.2s; white-space: nowrap; }
+  /* ===== PROJECT CARDS ===== */
+  .project-card { 
+    background: white; 
+    border: 1px solid var(--gray-200); 
+    border-radius: var(--radius-sm); 
+    padding: 16px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 12px; 
+    box-shadow: var(--shadow-sm); 
+    margin-bottom: 12px; 
+  }
+  .project-info h4 { font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+  .project-info p { font-size: 12px; color: var(--gray-500); line-height: 1.4; }
+  .btn-view-proj { 
+    background: var(--info-bg); 
+    color: var(--info); 
+    border: 1px solid rgba(3,105,161,0.2); 
+    padding: 10px 14px; 
+    min-height: var(--touch-min);
+    border-radius: 8px; 
+    font-size: 12px; 
+    font-weight: 700; 
+    text-decoration: none; 
+    transition: 0.2s; 
+    white-space: nowrap; 
+    display: flex;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+  }
   .btn-view-proj:hover { background: #e0f2fe; }
 
-  .error-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: var(--radius-sm); padding: 18px 20px; display: flex; align-items: flex-start; gap: 12px; animation: slideIn 0.3s ease both; }
+  .error-box { 
+    background: var(--error-bg); 
+    border: 1px solid var(--error-border); 
+    border-radius: var(--radius-sm); 
+    padding: 16px 18px; 
+    display: flex; 
+    align-items: flex-start; 
+    gap: 12px; 
+    animation: slideIn 0.3s ease both; 
+  }
   .error-box svg { width: 20px; height: 20px; fill: var(--error); flex-shrink: 0; margin-top: 1px; }
-  .error-box p { font-size: 14px; color: #991b1b; line-height: 1.5; }
+  .error-box p { font-size: 13px; color: #991b1b; line-height: 1.5; }
 
-  /* MODALS */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
-  .modal { background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
-  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 10; }
-  .modal-header h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
-  .modal-close { background: none; border: none; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: 4px; }
+  /* ===== SLIDER (SHOWCASE) ===== */
+  .st-slide { 
+    position: absolute; inset: 0; 
+    opacity: 0; 
+    transition: opacity 0.8s ease-in-out; 
+    display: flex; 
+    align-items: flex-end; 
+  }
+  .st-slide.active { opacity: 1; z-index: 2; }
+  .st-slide img { 
+    width: 100%; height: 100%; 
+    object-fit: cover; 
+    position: absolute; inset: 0; 
+    z-index: 1; 
+    opacity: 0.65; 
+    transition: transform 6s linear; 
+    transform: scale(1.05); 
+    display: block !important; 
+  }
+  .st-slide.active img { transform: scale(1); }
+  .st-content { 
+    position: relative; z-index: 3; 
+    padding: 20px 20px; 
+    color: white; 
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%); 
+    width: 100%; 
+    border-bottom: 3px solid var(--ms-green); 
+  }
+  .st-tag { 
+    font-size: 10px; font-weight: 800; 
+    background: var(--ms-green); 
+    padding: 3px 8px; 
+    border-radius: 4px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+    display: inline-block; 
+    margin-bottom: 6px; 
+  }
+  .st-title { font-size: 17px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.2; }
+  .st-desc { font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+  /* ===== QUOTES ===== */
+  .quotes-rotator { 
+    background: var(--ms-green-pale); 
+    border-left: 4px solid var(--ms-green); 
+    padding: 16px 20px; 
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0; 
+    margin-bottom: 28px; 
+    min-height: 76px; 
+    display: flex; 
+    align-items: center; 
+    position: relative; 
+  }
+  .quote-item { 
+    display: none; 
+    animation: fadeInQuote 0.6s ease; 
+    font-size: 13px; 
+    font-weight: 500; 
+    color: var(--ms-green-dark); 
+    line-height: 1.5; 
+    font-style: italic; 
+  }
+  .quote-item.active { display: block; }
+  .quote-author { 
+    display: block; 
+    font-size: 11px; 
+    font-weight: 800; 
+    color: var(--ms-green); 
+    margin-top: 6px; 
+    font-style: normal; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+  }
+  @keyframes fadeInQuote { 
+    from { opacity: 0; transform: translateX(-10px); } 
+    to { opacity: 1; transform: translateX(0); } 
+  }
+
+  /* ===== MODALS ===== */
+  .modal-overlay { 
+    position: fixed; inset: 0; 
+    background: rgba(0,0,0,0.6); 
+    z-index: 1000; 
+    display: flex; 
+    align-items: flex-end; /* Bottom sheet on mobile */
+    justify-content: center; 
+    padding: 0;
+    animation: fadeIn 0.2s ease; 
+  }
+  .modal { 
+    background: white; 
+    border-radius: var(--radius) var(--radius) 0 0; /* Bottom sheet style */
+    box-shadow: var(--shadow-lg); 
+    width: 100%; 
+    max-height: 92vh;
+    overflow-y: auto; 
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+    /* Pull handle visual */
+    padding-top: 8px;
+  }
+  /* Pull bar for bottom sheet */
+  .modal::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--gray-300);
+    border-radius: 2px;
+    margin: 0 auto 4px;
+  }
+  .modal-header { 
+    padding: 16px 20px; 
+    border-bottom: 1px solid var(--gray-200); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    position: sticky; top: 0; 
+    background: white; 
+    z-index: 10; 
+  }
+  .modal-header h3 { font-size: 17px; font-weight: 700; color: var(--gray-800); }
+  .modal-close { 
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    color: var(--gray-400); 
+    padding: 8px; 
+    border-radius: 8px;
+    min-width: 44px; min-height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
   .modal-close:hover { color: var(--error); }
-  .modal-close svg { width: 24px; height: 24px; fill: currentColor; display: block; }
-  .modal-body { padding: 24px; }
+  .modal-close svg { width: 22px; height: 22px; fill: currentColor; display: block; }
+  .modal-body { padding: 20px; padding-bottom: 32px; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  /* CBT MODAL STYLES */
+  /* ===== CBT STYLES ===== */
   .cbt-screen { display: none; animation: fadeIn 0.3s ease; }
   .cbt-screen.active { display: block; }
-  .cbt-exam-card { border: 1px solid var(--gray-200); padding: 16px; border-radius: 12px; margin-bottom: 12px; background: var(--gray-50); display: flex; justify-content: space-between; align-items: center; }
-  .cbt-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gray-200); padding-bottom: 16px; margin-bottom: 24px; }
-  .cbt-timer-box { background: #000; color: #ff3333; font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: bold; padding: 6px 12px; border-radius: 6px; letter-spacing: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-  .cbt-q-counter { font-size: 13px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-  .cbt-question-text { font-size: 18px; font-weight: 600; color: var(--gray-800); margin-bottom: 24px; line-height: 1.6; }
-  .cbt-option-row { display: flex; align-items: center; border: 1px solid var(--gray-300); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; cursor: pointer; transition: 0.2s; background: white; }
+  .cbt-exam-card { 
+    border: 1px solid var(--gray-200); 
+    padding: 14px 16px; 
+    border-radius: 12px; 
+    margin-bottom: 12px; 
+    background: var(--gray-50); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    gap: 12px;
+  }
+  .cbt-top-bar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 2px solid var(--gray-200); 
+    padding-bottom: 14px; 
+    margin-bottom: 20px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .cbt-timer-box { 
+    background: #000; 
+    color: #ff3333; 
+    font-family: 'Courier New', Courier, monospace; 
+    font-size: 20px; 
+    font-weight: bold; 
+    padding: 6px 10px; 
+    border-radius: 6px; 
+    letter-spacing: 2px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+    white-space: nowrap;
+  }
+  .cbt-q-counter { 
+    font-size: 12px; 
+    font-weight: 700; 
+    color: var(--gray-500); 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin-bottom: 14px; 
+  }
+  .cbt-question-text { 
+    font-size: 16px; 
+    font-weight: 600; 
+    color: var(--gray-800); 
+    margin-bottom: 20px; 
+    line-height: 1.6; 
+  }
+  .cbt-option-row { 
+    display: flex; 
+    align-items: center; 
+    border: 1px solid var(--gray-300); 
+    border-radius: 8px; 
+    padding: 14px 14px; 
+    min-height: var(--touch-min);
+    margin-bottom: 12px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    background: white;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   .cbt-option-row:hover { border-color: var(--ms-green); }
   .cbt-option-row.selected { border-color: var(--ms-green); background: var(--ms-green-pale); }
-  .cbt-radio-circle { width: 20px; height: 20px; border: 2px solid var(--gray-400); border-radius: 50%; margin-right: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cbt-radio-circle { 
+    width: 20px; height: 20px; 
+    border: 2px solid var(--gray-400); 
+    border-radius: 50%; 
+    margin-right: 14px; 
+    display: flex; 
+    align-items: center; justify-content: center; 
+    flex-shrink: 0; 
+  }
   .cbt-option-row.selected .cbt-radio-circle { border-color: var(--ms-green); }
-  .cbt-option-row.selected .cbt-radio-circle::after { content: ''; width: 10px; height: 10px; background: var(--ms-green); border-radius: 50%; }
-  .cbt-opt-letter { font-weight: 800; margin-right: 12px; color: var(--ms-green); width: 16px; font-size: 15px; }
-  .cbt-opt-text { font-size: 15px; color: var(--gray-800); }
-  .cbt-nav-row { display: flex; justify-content: space-between; border-top: 1px solid var(--gray-200); padding-top: 20px; margin-top: 32px; }
-  .cbt-score-display { text-align: center; padding: 30px 20px; }
-  .cbt-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--ms-green-pale); border: 4px solid var(--ms-green); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--ms-green-dark); margin: 0 auto 20px; transition: all 0.3s ease; }
+  .cbt-option-row.selected .cbt-radio-circle::after { 
+    content: ''; 
+    width: 10px; height: 10px; 
+    background: var(--ms-green); 
+    border-radius: 50%; 
+  }
+  .cbt-opt-letter { font-weight: 800; margin-right: 10px; color: var(--ms-green); width: 16px; font-size: 14px; }
+  .cbt-opt-text { font-size: 14px; color: var(--gray-800); flex: 1; line-height: 1.4; }
+  .cbt-nav-row { 
+    display: flex; 
+    justify-content: space-between; 
+    border-top: 1px solid var(--gray-200); 
+    padding-top: 18px; 
+    margin-top: 24px;
+    gap: 12px;
+  }
+  .cbt-score-display { text-align: center; padding: 24px 16px; }
+  .cbt-score-circle { 
+    width: 110px; height: 110px; 
+    border-radius: 50%; 
+    background: var(--ms-green-pale); 
+    border: 4px solid var(--ms-green); 
+    display: flex; 
+    align-items: center; justify-content: center; 
+    font-size: 28px; 
+    font-weight: 800; 
+    color: var(--ms-green-dark); 
+    margin: 0 auto 20px; 
+    transition: all 0.3s ease; 
+  }
 
-  /* TOAST */
-  .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-  .toast { background: var(--gray-800); color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease both; max-width: 340px; }
+  /* ===== TOAST ===== */
+  .toast-container { 
+    position: fixed; 
+    bottom: 16px; 
+    left: 16px; right: 16px;
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    z-index: 9999; 
+    pointer-events: none;
+  }
+  .toast { 
+    background: var(--gray-800); 
+    color: white; 
+    padding: 14px 18px; 
+    border-radius: 12px; 
+    font-size: 14px; 
+    font-weight: 500; 
+    box-shadow: var(--shadow-md); 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    animation: toastIn 0.3s ease both; 
+    pointer-events: auto;
+  }
   .toast.error { background: var(--error); }
-  @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastIn { 
+    from { opacity: 0; transform: translateY(20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
 
-  /* ================== ADBLOCKER-PROOF: SHOWCASE SLIDER & QUOTES ================== */
-  .featured-box { position: relative; width: 100%; height: 220px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); background: #111; margin-bottom: 20px; }
-  .featured-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
-  .featured-slide.active { opacity: 1; z-index: 2; }
-  .featured-slide img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; opacity: 0.65; transition: transform 6s linear; transform: scale(1.05); }
-  .featured-slide.active img { transform: scale(1); }
-  .featured-content { position: relative; z-index: 3; padding: 24px 28px; color: white; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%); width: 100%; border-bottom: 3px solid var(--ms-green); }
-  .featured-tag { font-size: 10px; font-weight: 800; background: var(--ms-green); padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 8px; }
-  .featured-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.2; }
-  .featured-desc { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-  
-  .quotes-rotator { background: var(--ms-green-pale); border-left: 4px solid var(--ms-green); padding: 18px 24px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 36px; min-height: 84px; display: flex; align-items: center; position: relative; }
-  .quote-item { display: none; animation: fadeInQuote 0.6s ease; font-size: 15px; font-weight: 500; color: var(--ms-green-dark); line-height: 1.5; font-style: italic; }
-  .quote-item.active { display: block; }
-  .quote-author { display: block; font-size: 12px; font-weight: 800; color: var(--ms-green); margin-top: 6px; font-style: normal; text-transform: uppercase; letter-spacing: 0.05em; }
-  @keyframes fadeInQuote { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  /* ===== SECTION DIVIDER ===== */
+  .section-divider { 
+    height: 1px; 
+    background: var(--gray-200); 
+    margin: 32px 0; 
+  }
 
-  @media (max-width: 768px) {
-    .portal-wrapper { flex-direction: column; border-radius: 20px; }
-    .left-panel { width: 100%; min-width: 0; padding: 32px 24px; }
-    .right-panel { padding: 32px 24px; }
-    .result-fields { grid-template-columns: 1fr; }
+  /* ===== MOBILE-FIRST BANNER STRIP ===== */
+  .mobile-contact-strip {
+    display: none;
+    background: rgba(255,255,255,0.12);
+    padding: 12px 20px;
+    gap: 16px;
+  }
+  .mobile-contact-strip a {
+    color: rgba(255,255,255,0.88);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+  }
+  .mobile-contact-strip svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+
+  /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+  /* Tablet */
+  @media (max-width: 820px) {
+    body { padding: 0; }
+    .portal-wrapper { 
+      flex-direction: column; 
+      border-radius: 0; 
+      min-height: 100vh;
+      box-shadow: none;
+      max-width: 100%;
+    }
+    .left-panel { 
+      width: 100%; 
+      min-width: 0; 
+      padding: 28px 20px 20px;
+      flex-direction: column;
+    }
+    .left-heading { font-size: 20px; }
+    .left-sub { font-size: 13px; margin-bottom: 16px; }
     .contact-info { display: none; }
-    .featured-box { height: 180px; }
+    .left-footer { padding-top: 16px; }
+    .mobile-contact-strip { display: flex; }
+
+    .right-panel { 
+      padding: 20px 16px 32px;
+      flex: none;
+    }
+    .right-header h2 { font-size: 22px; }
+
+    /* Result fields — single column on small screens */
+    .result-fields { grid-template-columns: 1fr; }
+
+    /* Action buttons stacked */
+    .action-buttons-row { flex-direction: column !important; }
+    .action-buttons-row .btn-outline-menu { flex: none !important; min-width: 0 !important; }
+  }
+
+  /* Mobile (small phones) */
+  @media (max-width: 480px) {
+    .logo-area { gap: 10px; margin-bottom: 16px; }
+    .logo-img-wrap { width: 44px; height: 44px; border-radius: 10px; }
+    .logo-img-wrap img { width: 36px; height: 36px; }
+    .brand-text h1 { font-size: 13px; }
+
+    /* Slider shorter on small screens */
+    #stGallery { height: 170px !important; min-height: 170px !important; }
+
+    .cbt-top-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .cbt-timer-box { font-size: 18px; }
+    .cbt-question-text { font-size: 15px; }
+    .cbt-nav-row { flex-direction: column-reverse; gap: 8px; }
+    .cbt-nav-row .btn-outline-menu,
+    .cbt-nav-row .btn-search { width: 100%; }
+
+    .result-card { padding: 16px; }
+    .result-card-header { gap: 10px; }
+    .result-avatar { width: 44px; height: 44px; font-size: 16px; }
+    .result-name { font-size: 15px; }
+
+    .project-card { flex-direction: column; align-items: flex-start; }
+    .btn-view-proj { width: 100%; justify-content: center; }
+
+    .modal-body { padding: 16px; padding-bottom: 40px; }
+    .modal-header { padding: 14px 16px; }
+  }
+
+  /* Very small phones */
+  @media (max-width: 360px) {
+    .right-panel { padding: 16px 14px 24px; }
+    .right-header h2 { font-size: 20px; }
+    #stGallery { height: 150px !important; min-height: 150px !important; }
+  }
+
+  /* Landscape mobile — limit left panel height */
+  @media (max-width: 820px) and (orientation: landscape) {
+    .left-panel { padding: 16px 20px; }
+    .left-heading { font-size: 18px; }
+    .left-sub { display: none; }
+    #stGallery { height: 160px !important; min-height: 160px !important; }
+  }
+
+  /* Desktop modal centering (override bottom-sheet on large screens) */
+  @media (min-width: 821px) {
+    body { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 16px; 
+    }
+    .modal-overlay { 
+      align-items: center; 
+      padding: 16px; 
+    }
+    .modal { 
+      border-radius: var(--radius); 
+      max-width: 800px;
+    }
+    .modal::before { display: none; }
+    .toast-container {
+      left: auto;
+      right: 24px;
+      bottom: 24px;
+      width: 340px;
+    }
   }
 </style>
 </head>
@@ -193,6 +837,8 @@
 </div>
 
 <div class="portal-wrapper">
+
+  <!-- ===== LEFT PANEL ===== -->
   <div class="left-panel">
     <div class="dot-grid"></div>
     <div class="brand-section">
@@ -214,6 +860,7 @@
       <div class="divider"></div>
     </div>
 
+    <!-- Contact info — hidden on mobile (shown in strip below) -->
     <div class="contact-info">
       <div class="contact-item">
         <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
@@ -225,26 +872,40 @@
       </div>
     </div>
 
+    <!-- Mobile-only contact strip inside left panel -->
+    <div class="mobile-contact-strip">
+      <a href="tel:+2348162337303">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        08162337303
+      </a>
+      <a href="mailto:microsoftportharcourt@gmail.com">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        Email Us
+      </a>
+    </div>
+
     <div class="left-footer">
-      <p>© Microsoft Imagine Academy. All rights reserved.</p>
-      <a href="admin.html" class="secret-admin-link">Admin Login</a>
+      <p>© Microsoft Imagine Academy.</p>
+      <a href="admin.html" class="secret-admin-link">Admin</a>
     </div>
   </div>
 
+  <!-- ===== RIGHT PANEL ===== -->
   <div class="right-panel">
-    
-    <!-- ================== NEW: ADBLOCKER-PROOF SHOWCASE SLIDER ================== -->
-    <h3 style="font-size: 16px; font-weight: 800; color: var(--ms-green); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">🏆 Featured Student Projects</h3>
-    
-    <div class="featured-box" id="featuredProjectsBox">
-      <div style="padding:24px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:600;">Loading Showcase...</div>
+
+    <!-- FEATURED PROJECTS SLIDER -->
+    <h3 style="font-size:13px; font-weight:800; color:var(--ms-green); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.06em;">🏆 Featured Student Projects</h3>
+
+    <div id="stGallery" style="display:block !important; visibility:visible !important; position:relative; width:100%; height:200px; min-height:200px; border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.1); background:#1a1a1a; margin-bottom:16px;">
+      <div style="padding:20px; color:rgba(255,255,255,0.7); font-size:13px; font-weight:600;">Loading Images...</div>
     </div>
-    
-    <!-- ================== NEW: MOTIVATIONAL QUOTES ================== -->
+
+    <!-- MOTIVATIONAL QUOTES -->
     <div class="quotes-rotator" id="quotesRotator">
       <div class="quote-item active">"Loading inspiration..." <span class="quote-author"></span></div>
     </div>
 
+    <!-- SEARCH SECTION -->
     <div class="right-header">
       <h2>Find Your Record</h2>
       <p>Enter your full name exactly as registered to locate your certificates and course projects.</p>
@@ -254,103 +915,108 @@
       <label for="nameInput">Full Name</label>
       <div class="input-wrap">
         <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></span>
-        <input type="text" id="nameInput" placeholder="e.g. John Adebayo Doe" autocomplete="off">
+        <input type="text" id="nameInput" placeholder="e.g. John Adebayo Doe" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
       </div>
     </div>
 
     <button class="btn-search" id="searchBtn" onclick="searchCertificate()">
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Record
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      Search Record
     </button>
 
     <div class="result-area" id="resultArea"></div>
 
-    <div class="divider" style="margin: 40px 0;"></div>
-    
-    <div class="right-header" style="margin-bottom: 24px;">
-      <h2 style="font-size: 22px;">Academic Portals</h2>
-      <p style="font-size: 13px;">Take your exams or download project materials.</p>
+    <div class="section-divider"></div>
+
+    <div class="right-header" style="margin-bottom:16px;">
+      <h2 style="font-size:20px;">Academic Portals</h2>
+      <p style="font-size:13px;">Take your exams or download project materials.</p>
     </div>
-    
-    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-        <button class="btn-outline-menu" onclick="openCbtModal()" style="flex:1; min-width: 200px;">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-4H8V6h5v2z"/></svg>
-          Take CBT Exam
-        </button>
-        <button class="btn-outline-menu" onclick="openProjectsModal()" style="flex:1; min-width: 200px;">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-          Browse Projects
-        </button>
+
+    <div class="action-buttons-row" style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn-outline-menu" onclick="openCbtModal()" style="flex:1; min-width:200px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-4H8V6h5v2z"/></svg>
+        Take CBT Exam
+      </button>
+      <button class="btn-outline-menu" onclick="openProjectsModal()" style="flex:1; min-width:200px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+        Browse Projects
+      </button>
     </div>
 
   </div>
 </div>
 
+<!-- ===== CBT MODAL ===== -->
 <div id="cbtModalOverlay" class="modal-overlay" style="display:none" onclick="closeCbtModal(event)">
-  <div class="modal" id="cbtModalBox" style="max-width: 800px;">
+  <div class="modal" id="cbtModalBox">
     <div class="modal-header">
       <h3>Computer Based Test (CBT)</h3>
       <button class="modal-close" onclick="closeCbtModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
     </div>
     <div class="modal-body">
-       <div id="cbtScreenLogin" class="cbt-screen active">
-           <p style="font-size:14px; color:var(--gray-600); margin-bottom:20px;">Enter your full name to automatically locate any active exams for your class.</p>
-           <div class="search-group">
-               <label>Full Name *</label>
-               <div class="input-wrap"><input type="text" id="cbtNameInput" placeholder="e.g. John Doe"></div>
-           </div>
-           <button class="btn-search" onclick="checkCbtExams()">Check Available Exams</button>
-       </div>
+      <div id="cbtScreenLogin" class="cbt-screen active">
+        <p style="font-size:14px; color:var(--gray-600); margin-bottom:16px;">Enter your full name to automatically locate any active exams for your class.</p>
+        <div class="search-group">
+          <label>Full Name *</label>
+          <div class="input-wrap">
+            <input type="text" id="cbtNameInput" placeholder="e.g. John Doe" autocorrect="off" autocapitalize="words" spellcheck="false">
+          </div>
+        </div>
+        <button class="btn-search" onclick="checkCbtExams()">Check Available Exams</button>
+      </div>
 
-       <div id="cbtScreenList" class="cbt-screen">
-           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-               <h4 style="font-size:16px; font-weight:700;">Available Exams</h4>
-               <button class="btn-outline-menu" style="padding:6px 12px; width:auto; font-size:12px;" onclick="showCbtScreen('cbtScreenLogin')">Change Details</button>
-           </div>
-           <div id="cbtExamsContainer"></div>
-       </div>
+      <div id="cbtScreenList" class="cbt-screen">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:12px;">
+          <h4 style="font-size:16px; font-weight:700;">Available Exams</h4>
+          <button class="btn-outline-menu" style="padding:8px 14px; width:auto; font-size:12px; min-height:36px; flex-shrink:0;" onclick="showCbtScreen('cbtScreenLogin')">Change</button>
+        </div>
+        <div id="cbtExamsContainer"></div>
+      </div>
 
-       <div id="cbtScreenTake" class="cbt-screen">
-           <div class="cbt-top-bar">
-               <div style="display:flex; align-items:center;">
-                   <span style="background:var(--ms-green); color:white; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;" id="cbtExamBadge">EXAM</span>
-                   <span style="font-size:14px; font-weight:700; color:var(--gray-800); margin-left:12px;" id="cbtExamActiveTitle">Title</span>
-               </div>
-               <div class="cbt-timer-box" id="cbtTimerDisplay">00:00:00</div>
-           </div>
-           
-           <div class="cbt-q-counter" id="cbtProgressTracker">QUESTION 1 OF X</div>
-           <div id="cbtQuestionContainer"></div>
-           
-           <div class="cbt-nav-row">
-               <button class="btn-outline-menu" id="cbtPrevBtn" style="width:auto; padding:10px 24px;" onclick="navigateCbt(-1)">&larr; Previous</button>
-               <button class="btn-search" id="cbtNextBtn" style="width:auto; padding:10px 32px;" onclick="navigateCbt(1)">Next &rarr;</button>
-           </div>
-       </div>
+      <div id="cbtScreenTake" class="cbt-screen">
+        <div class="cbt-top-bar">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="background:var(--ms-green); color:white; padding:4px 10px; border-radius:4px; font-size:11px; font-weight:700;" id="cbtExamBadge">EXAM</span>
+            <span style="font-size:13px; font-weight:700; color:var(--gray-800);" id="cbtExamActiveTitle">Title</span>
+          </div>
+          <div class="cbt-timer-box" id="cbtTimerDisplay">00:00:00</div>
+        </div>
 
-       <div id="cbtScreenResult" class="cbt-screen">
-           <div class="cbt-score-display">
-               <h3 style="font-size:24px; font-weight:800; color:var(--gray-800); margin-bottom:8px;">Exam Completed!</h3>
-               <p style="color:var(--gray-500); margin-bottom:30px;">Your score has been successfully recorded.</p>
-               <div class="cbt-score-circle" id="cbtFinalPercentage">0%</div>
-               <p style="font-size:16px; font-weight:600; color:var(--gray-700);">You scored <span id="cbtFinalScore" style="color:var(--ms-green);">0</span> out of <span id="cbtTotalScore">0</span>.</p>
-               <div id="cbtSaveStatus" style="font-size:13px; color:var(--warning); margin-top:20px; font-weight:600;">Saving to database... Please do not close window.</div>
-               <button id="cbtRetryBtn" class="btn-outline-menu" style="display:none; margin:10px auto 0; padding:6px 12px; width:auto;" onclick="retrySaveCbt()">Retry Save</button>
-           </div>
-           <button class="btn-search" style="margin-top:20px;" onclick="closeCbtModal()">Return to Dashboard</button>
-       </div>
+        <div class="cbt-q-counter" id="cbtProgressTracker">QUESTION 1 OF X</div>
+        <div id="cbtQuestionContainer"></div>
+
+        <div class="cbt-nav-row">
+          <button class="btn-outline-menu" id="cbtPrevBtn" style="width:auto; padding:12px 24px; flex:1;" onclick="navigateCbt(-1)">&larr; Previous</button>
+          <button class="btn-search" id="cbtNextBtn" style="width:auto; padding:12px 28px; flex:1;" onclick="navigateCbt(1)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <div id="cbtScreenResult" class="cbt-screen">
+        <div class="cbt-score-display">
+          <h3 style="font-size:22px; font-weight:800; color:var(--gray-800); margin-bottom:8px;">Exam Completed!</h3>
+          <p style="color:var(--gray-500); margin-bottom:24px;">Your score has been successfully recorded.</p>
+          <div class="cbt-score-circle" id="cbtFinalPercentage">0%</div>
+          <p style="font-size:15px; font-weight:600; color:var(--gray-700);">You scored <span id="cbtFinalScore" style="color:var(--ms-green);">0</span> out of <span id="cbtTotalScore">0</span>.</p>
+          <div id="cbtSaveStatus" style="font-size:13px; color:var(--warning); margin-top:16px; font-weight:600;">Saving to database... Please do not close window.</div>
+          <button id="cbtRetryBtn" class="btn-outline-menu" style="display:none; margin:10px auto 0; padding:8px 14px; width:auto;" onclick="retrySaveCbt()">Retry Save</button>
+        </div>
+        <button class="btn-search" style="margin-top:16px;" onclick="closeCbtModal()">Return to Dashboard</button>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- ===== PROJECTS MODAL ===== -->
 <div id="projectsModalOverlay" class="modal-overlay" style="display:none" onclick="closeProjectsModal(event)">
-  <div class="modal" id="projectsModalBox" style="max-width: 700px; width:100%;">
+  <div class="modal" id="projectsModalBox">
     <div class="modal-header">
       <h3>All Course Projects</h3>
       <button class="modal-close" onclick="closeProjectsModal()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
     </div>
     <div class="modal-body">
-       <div id="projectsLoading" style="text-align:center; padding:20px; color:var(--gray-500);">Loading projects...</div>
-       <div id="projectsList" style="display:grid; gap:12px;"></div>
+      <div id="projectsLoading" style="text-align:center; padding:20px; color:var(--gray-500);">Loading projects...</div>
+      <div id="projectsList" style="display:grid; gap:12px;"></div>
     </div>
   </div>
 </div>
@@ -366,11 +1032,9 @@ async function fetchSheet(sheetName) {
     const res = await fetch(`${SCRIPT_URL}?sheet=${sheetName}`);
     const text = await res.text();
     try {
-        const json = JSON.parse(text);
-        return Array.isArray(json) ? json.filter(item => item !== null && typeof item === 'object' && Object.keys(item).length > 0) : [];
-    } catch(err) {
-        return [];
-    }
+      const json = JSON.parse(text);
+      return Array.isArray(json) ? json.filter(item => item !== null && typeof item === 'object' && Object.keys(item).length > 0) : [];
+    } catch(err) { return []; }
   } catch(e) { return []; }
 }
 
@@ -396,25 +1060,32 @@ async function saveSheet(sheetName, data) {
 }
 
 // ===================== UTILS =====================
-function showLoader(msg = "Loading...") { 
+function showLoader(msg = "Loading...") {
   document.getElementById('loaderText').textContent = msg;
-  document.getElementById('globalLoader').style.display = 'flex'; 
+  document.getElementById('globalLoader').style.display = 'flex';
 }
 function hideLoader() { document.getElementById('globalLoader').style.display = 'none'; }
+
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `<span>${type==='error'?'✕':'✓'}</span><span>${message}</span>`;
   container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3500);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
 }
+
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function getInitials(name) { return (!name) ? '' : String(name).trim().split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join(''); }
 function escapeHtml(str) { return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escapeAttr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
-// ===================== ADBLOCKER-PROOF: SHOWCASE & QUOTES ENGINE =====================
+// ===================== SHOWCASE & QUOTES =====================
 let showcaseSlideInterval, quotesInterval;
 let currentShowcaseSlide = 0, currentQuoteIndex = 0;
 
@@ -424,7 +1095,7 @@ const defaultQuotes = [
   { text: "The Web as I envisaged it, we have not seen it yet. The future is still so much bigger than the past.", author: "Tim Berners-Lee" },
   { text: "Make every minute count. The future of tech belongs to those who build it.", author: "MIACert Academy" },
   { text: "Innovation is the outcome of a habit, not a random act.", author: "Sukant Ratnakar" },
-  { text: "Code is like humor. When you have to explain it, it’s bad.", author: "Cory House" }
+  { text: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" }
 ];
 
 const defaultProjects = [
@@ -435,32 +1106,32 @@ const defaultProjects = [
 
 async function loadShowcaseData() {
   try {
-    const [dbProjects, dbQuotes] = await Promise.all([ fetchSheet('TopProjects'), fetchSheet('Quotes') ]);
-    
-    // Render Slider
-    const projects = (dbProjects && dbProjects.length >= 3) ? dbProjects.slice(0,3) : defaultProjects;
-    const sliderContainer = document.getElementById('featuredProjectsBox');
-    sliderContainer.innerHTML = projects.map((p, i) => `
-      <div class="featured-slide ${i === 0 ? 'active' : ''}">
-        <img src="${escapeAttr(p.imgUrl)}" alt="Top Project" onerror="this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80'">
-        <div class="featured-content">
-          <div class="featured-tag">Project of the Month</div>
-          <div class="featured-title">${escapeHtml(p.title)}</div>
-          <div class="featured-desc">${escapeHtml(p.desc)}</div>
+    const [dbProjects, dbQuotes] = await Promise.all([fetchSheet('TopProjects'), fetchSheet('Quotes')]);
+
+    let validProjects = (dbProjects || []).filter(p => p && p.imgUrl && p.imgUrl.trim() !== '');
+    const projectsToRender = validProjects.length >= 1 ? validProjects.slice(0, 3) : defaultProjects;
+
+    const sliderContainer = document.getElementById('stGallery');
+    sliderContainer.innerHTML = projectsToRender.map((p, i) => `
+      <div class="st-slide ${i === 0 ? 'active' : ''}">
+        <img src="${escapeAttr(p.imgUrl)}" alt="Top Project" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80'">
+        <div class="st-content">
+          <div class="st-tag">Project of the Month</div>
+          <div class="st-title">${escapeHtml(p.title || 'Student Project')}</div>
+          <div class="st-desc">${escapeHtml(p.desc || 'Explore amazing projects.')}</div>
         </div>
       </div>
     `).join('');
 
     if(showcaseSlideInterval) clearInterval(showcaseSlideInterval);
     showcaseSlideInterval = setInterval(() => {
-      const slides = document.querySelectorAll('.featured-slide');
+      const slides = document.querySelectorAll('.st-slide');
       if(!slides.length) return;
       slides[currentShowcaseSlide].classList.remove('active');
       currentShowcaseSlide = (currentShowcaseSlide + 1) % slides.length;
       slides[currentShowcaseSlide].classList.add('active');
     }, 4500);
 
-    // Render Quotes
     const quotes = (dbQuotes && dbQuotes.length > 0) ? dbQuotes : defaultQuotes;
     const quotesContainer = document.getElementById('quotesRotator');
     quotesContainer.innerHTML = quotes.map((q, i) => `
@@ -490,18 +1161,18 @@ async function searchCertificate() {
 
   if (!input) { showToast('Please enter your full name to search.', 'error'); document.getElementById('nameInput').focus(); return; }
 
-  btn.innerHTML = '<div class="loading-spinner"></div> Searching Database...';
+  btn.innerHTML = '<div class="loader-circle" style="width:20px;height:20px;border-width:3px;margin-right:8px;"></div> Searching...';
   btn.disabled = true;
   resultArea.innerHTML = '';
 
   try {
-    const [students, certificates, projects] = await Promise.all([ fetchSheet('Students'), fetchSheet('Certificates'), fetchSheet('Projects') ]);
-    
+    const [students, certificates, projects] = await Promise.all([fetchSheet('Students'), fetchSheet('Certificates'), fetchSheet('Projects')]);
+
     const inputStr = String(input).toLowerCase();
     const student = students.find(s => String(s.fullName || '').trim().toLowerCase() === inputStr);
 
     if (!student) {
-      resultArea.innerHTML = `<div class="error-box"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><p><strong>Result Not Found</strong>Your record is not available in the database. Please check your spelling or contact your administrator.</p></div>`;
+      resultArea.innerHTML = `<div class="error-box"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><p><strong>Result Not Found</strong> — Your record is not in the database. Check your spelling or contact your administrator.</p></div>`;
       btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Record`;
       btn.disabled = false;
       return;
@@ -509,17 +1180,17 @@ async function searchCertificate() {
 
     let cert = null;
     if (student.manualCertId) { cert = certificates.find(c => String(c.id) === String(student.manualCertId)); }
-    if (!cert) { 
-        cert = certificates.find(c => 
-            String(c.course || '').trim().toLowerCase() === String(student.course || '').trim().toLowerCase() && 
-            String(c.classBatch || '').trim().toLowerCase() === String(student.classBatch || '').trim().toLowerCase()
-        ); 
+    if (!cert) {
+      cert = certificates.find(c =>
+        String(c.course || '').trim().toLowerCase() === String(student.course || '').trim().toLowerCase() &&
+        String(c.classBatch || '').trim().toLowerCase() === String(student.classBatch || '').trim().toLowerCase()
+      );
     }
 
     const targetCourse = cert ? String(cert.course) : String(student.course);
     const targetBatch = cert ? String(cert.classBatch) : String(student.classBatch);
-    
-    const studentProjects = (Array.isArray(projects) ? projects : []).filter(p => 
+
+    const studentProjects = (Array.isArray(projects) ? projects : []).filter(p =>
       String(p.course || '').trim().toLowerCase() === targetCourse.trim().toLowerCase() &&
       String(p.classBatch || '').trim().toLowerCase() === targetBatch.trim().toLowerCase()
     );
@@ -527,7 +1198,7 @@ async function searchCertificate() {
     let resultHtml = '';
 
     if (!cert) {
-      resultHtml += `<div class="error-box"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><p><strong>Certificate Not Ready</strong>Your record was found but your certificate template has not been registered yet. Please contact your administrator.</p></div>`;
+      resultHtml += `<div class="error-box"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><p><strong>Certificate Not Ready</strong> — Your record was found but your certificate template has not been registered yet. Please contact your administrator.</p></div>`;
     } else {
       let mappedCertName = cert.certName;
       const sCourse = targetCourse.toLowerCase();
@@ -558,50 +1229,57 @@ async function searchCertificate() {
     }
 
     if (studentProjects.length > 0) {
-      resultHtml += `<div style="margin-top:24px;"><h3 style="font-size:18px;font-weight:700;margin-bottom:12px;color:var(--gray-800)">Course Projects & Materials</h3><div style="display:grid;gap:12px;">
-            ${studentProjects.map(p => `
-              <div class="project-card">
-                <div class="project-info"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description || '')}</p></div>
-                <a href="${escapeHtml(p.fileUrl)}" target="_blank" class="btn-view-proj">View Document</a>
-              </div>
-            `).join('')}
-          </div></div>`;
+      resultHtml += `<div style="margin-top:20px;"><h3 style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--gray-800)">Course Projects & Materials</h3><div style="display:grid;gap:10px;">
+        ${studentProjects.map(p => `
+          <div class="project-card">
+            <div class="project-info"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description || '')}</p></div>
+            <a href="${escapeHtml(p.fileUrl)}" target="_blank" rel="noopener" class="btn-view-proj">View</a>
+          </div>
+        `).join('')}
+      </div></div>`;
     }
+
     resultArea.innerHTML = resultHtml;
-  } catch (error) { 
-      console.error("Search Error:", error);
-      showToast('An error occurred during search. Please try again.', 'error'); 
+
+    // Scroll to results on mobile
+    if (window.innerWidth <= 820) {
+      setTimeout(() => resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+  } catch (error) {
+    console.error("Search Error:", error);
+    showToast('An error occurred during search. Please try again.', 'error');
   }
 
   btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Search Record`;
   btn.disabled = false;
 }
 
-// ===================== ALL PROJECTS MODAL =====================
+// ===================== PROJECTS MODAL =====================
 async function openProjectsModal() {
   document.getElementById('projectsModalOverlay').style.display = 'flex';
   document.getElementById('projectsLoading').style.display = 'block';
   document.getElementById('projectsList').innerHTML = '';
   try {
-      const projects = await fetchSheet('Projects');
-      document.getElementById('projectsLoading').style.display = 'none';
-      if(!Array.isArray(projects) || projects.length === 0) {
-          document.getElementById('projectsList').innerHTML = '<p style="text-align:center;color:var(--gray-500);">No course projects available at the moment.</p>';
-          return;
-      }
-      document.getElementById('projectsList').innerHTML = projects.map(p => `
-        <div class="project-card" style="display:flex; justify-content:space-between; align-items:center; background:var(--gray-50); padding:16px; border-radius:12px; border:1px solid var(--gray-200);">
-          <div>
-            <h4 style="font-size:15px; font-weight:700; color:var(--gray-800); margin-bottom:4px;">${escapeHtml(p.title)}</h4>
-            <p style="font-size:12px; color:var(--gray-500); margin-bottom:6px;">${escapeHtml(p.course)} • ${escapeHtml(p.classBatch)}</p>
-            <p style="font-size:13px; color:var(--gray-600);">${escapeHtml(p.description)}</p>
-          </div>
-          <a href="${escapeHtml(p.fileUrl)}" target="_blank" class="btn-download" style="width:auto; padding:10px 16px; font-size:13px; text-decoration:none;">View</a>
+    const projects = await fetchSheet('Projects');
+    document.getElementById('projectsLoading').style.display = 'none';
+    if(!Array.isArray(projects) || projects.length === 0) {
+      document.getElementById('projectsList').innerHTML = '<p style="text-align:center;color:var(--gray-500);">No course projects available at the moment.</p>';
+      return;
+    }
+    document.getElementById('projectsList').innerHTML = projects.map(p => `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--gray-50); padding:14px; border-radius:12px; border:1px solid var(--gray-200);">
+        <div style="flex:1; min-width:0;">
+          <h4 style="font-size:14px; font-weight:700; color:var(--gray-800); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.title)}</h4>
+          <p style="font-size:12px; color:var(--gray-500); margin-bottom:4px;">${escapeHtml(p.course)} • ${escapeHtml(p.classBatch)}</p>
+          <p style="font-size:12px; color:var(--gray-600);">${escapeHtml(p.description)}</p>
         </div>
-      `).join('');
-  } catch(e) { 
-      document.getElementById('projectsLoading').style.display = 'none';
-      document.getElementById('projectsList').innerHTML = '<p style="text-align:center;color:var(--error);">Failed to load course projects.</p>'; 
+        <a href="${escapeHtml(p.fileUrl)}" target="_blank" rel="noopener" class="btn-download" style="width:auto; padding:10px 14px; font-size:13px; text-decoration:none; flex-shrink:0; min-height:44px;">View</a>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('projectsLoading').style.display = 'none';
+    document.getElementById('projectsList').innerHTML = '<p style="text-align:center;color:var(--error);">Failed to load course projects.</p>';
   }
 }
 function closeProjectsModal(e) {
@@ -611,16 +1289,22 @@ function closeProjectsModal(e) {
 
 // ===================== CBT ENGINE =====================
 let cbtExams = [], cbtCurrentExam = null, cbtCurrentIndex = 0, cbtQuestions = [], cbtAnswers = {}, cbtStudentData = { name: '', batch: '' }, cbtTimerInterval = null;
+
 function showCbtScreen(screenId) { document.querySelectorAll('.cbt-screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
 function openCbtModal() { document.getElementById('cbtModalOverlay').style.display = 'flex'; showCbtScreen('cbtScreenLogin'); }
-function closeCbtModal(e) { if (e && e.target !== document.getElementById('cbtModalOverlay')) return; clearInterval(cbtTimerInterval); document.getElementById('cbtModalOverlay').style.display = 'none'; cbtCurrentExam = null; cbtQuestions = []; cbtAnswers = {}; }
+function closeCbtModal(e) {
+  if (e && e.target !== document.getElementById('cbtModalOverlay')) return;
+  clearInterval(cbtTimerInterval);
+  document.getElementById('cbtModalOverlay').style.display = 'none';
+  cbtCurrentExam = null; cbtQuestions = []; cbtAnswers = {};
+}
 
 async function checkCbtExams() {
   const name = document.getElementById('cbtNameInput').value.trim();
   if(!name) { showToast('Please enter your Full Name.', 'error'); return; }
   showLoader("Locating your profile...");
   try {
-    const [students, exams, results] = await Promise.all([ fetchSheet('Students'), fetchSheet('Exams'), fetchSheet('CBT_Results') ]);
+    const [students, exams, results] = await Promise.all([fetchSheet('Students'), fetchSheet('Exams'), fetchSheet('CBT_Results')]);
     const nameStr = String(name).toLowerCase();
     const student = students.find(s => String(s.fullName || '').trim().toLowerCase() === nameStr);
     if (!student) { hideLoader(); showToast('Student record not found. Check your spelling.', 'error'); return; }
@@ -628,17 +1312,17 @@ async function checkCbtExams() {
     cbtStudentData.name = student.fullName;
     cbtStudentData.batch = batch;
     cbtExams = exams.filter(e => {
-        if (String(e.isLive).toLowerCase() !== 'true') return false;
-        return String(e.classBatch || '').split(',').map(b => b.trim().toLowerCase()).includes(batch.trim().toLowerCase());
+      if (String(e.isLive).toLowerCase() !== 'true') return false;
+      return String(e.classBatch || '').split(',').map(b => b.trim().toLowerCase()).includes(batch.trim().toLowerCase());
     });
     const container = document.getElementById('cbtExamsContainer');
     if(cbtExams.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:30px; background:var(--gray-50); border-radius:12px; border:1px solid var(--gray-200);"><p style="color:var(--gray-500);">No live exams available for your class at this moment.</p></div>`;
+      container.innerHTML = `<div style="text-align:center; padding:24px; background:var(--gray-50); border-radius:12px; border:1px solid var(--gray-200);"><p style="color:var(--gray-500);">No live exams available for your class at this moment.</p></div>`;
     } else {
       container.innerHTML = cbtExams.map(ex => {
         const taken = results.find(r => r.studentName === cbtStudentData.name && String(r.examId) === String(ex.id));
-        if (taken) { return `<div class="cbt-exam-card" style="opacity:0.6;"><div><h4 style="color:var(--gray-600);">${escapeHtml(ex.title)}</h4><p>${escapeHtml(ex.course)}</p></div><span style="font-size:12px; font-weight:700; color:var(--success);">Already Completed</span></div>`; }
-        return `<div class="cbt-exam-card"><div><h4 style="font-size:15px; font-weight:700; color:var(--gray-800);">${escapeHtml(ex.title)}</h4><p style="font-size:12px; color:var(--gray-500);">${escapeHtml(ex.course)} • ${ex.duration || 30} mins</p></div><button class="btn-search" style="width:auto; padding:8px 16px; font-size:13px;" onclick="startCbtExam('${ex.id}')">Start Test</button></div>`;
+        if (taken) { return `<div class="cbt-exam-card" style="opacity:0.6;"><div><h4 style="color:var(--gray-600);font-size:14px;">${escapeHtml(ex.title)}</h4><p style="font-size:12px;color:var(--gray-500);">${escapeHtml(ex.course)}</p></div><span style="font-size:12px; font-weight:700; color:var(--success); white-space:nowrap;">✓ Completed</span></div>`; }
+        return `<div class="cbt-exam-card"><div><h4 style="font-size:14px; font-weight:700; color:var(--gray-800); margin-bottom:4px;">${escapeHtml(ex.title)}</h4><p style="font-size:12px; color:var(--gray-500);">${escapeHtml(ex.course)} • ${ex.duration || 30} mins</p></div><button class="btn-search" style="width:auto; padding:10px 16px; font-size:13px; flex-shrink:0; min-height:44px;" onclick="startCbtExam('${ex.id}')">Start</button></div>`;
       }).join('');
     }
     showCbtScreen('cbtScreenList');
@@ -663,15 +1347,17 @@ function startCbtTimer(minutes) {
   let timeRemaining = minutes * 60;
   clearInterval(cbtTimerInterval);
   cbtTimerInterval = setInterval(() => {
-      timeRemaining--;
-      let h = Math.floor(timeRemaining / 3600), m = Math.floor((timeRemaining % 3600) / 60), s = timeRemaining % 60;
-      let display = '';
-      if(h > 0) display += String(h).padStart(2, '0') + ':';
-      display += String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-      const timerBox = document.getElementById('cbtTimerDisplay');
+    timeRemaining--;
+    let h = Math.floor(timeRemaining / 3600), m = Math.floor((timeRemaining % 3600) / 60), s = timeRemaining % 60;
+    let display = '';
+    if(h > 0) display += String(h).padStart(2, '0') + ':';
+    display += String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    const timerBox = document.getElementById('cbtTimerDisplay');
+    if(timerBox) {
       timerBox.textContent = display;
-      if(timeRemaining <= 300) { timerBox.style.color = '#ff0000'; } 
-      if (timeRemaining <= 0) { clearInterval(cbtTimerInterval); showToast("Time's up! Auto-submitting exam.", "error"); finishCbtExam(true); }
+      if(timeRemaining <= 300) { timerBox.style.color = '#ff0000'; }
+    }
+    if (timeRemaining <= 0) { clearInterval(cbtTimerInterval); showToast("Time's up! Auto-submitting exam.", "error"); finishCbtExam(true); }
   }, 1000);
 }
 
@@ -682,36 +1368,39 @@ function renderCbtQuestion() {
     const optText = q['opt' + letter];
     if(!optText) return '';
     const isSelected = cbtAnswers[cbtCurrentIndex] === letter;
-    return `<label class="cbt-option-row ${isSelected ? 'selected' : ''}" onclick="selectCbtOption('${letter}')"><div class="cbt-radio-circle"></div><div class="cbt-opt-letter">${letter}</div> <div class="cbt-opt-text">${escapeHtml(optText)}</div></label>`;
+    return `<label class="cbt-option-row ${isSelected ? 'selected' : ''}" onclick="selectCbtOption('${letter}')"><div class="cbt-radio-circle"></div><div class="cbt-opt-letter">${letter}</div><div class="cbt-opt-text">${escapeHtml(optText)}</div></label>`;
   }).join('');
   container.innerHTML = `<div class="cbt-question-text">${escapeHtml(q.question)}</div>${optionsHtml}`;
   document.getElementById('cbtProgressTracker').textContent = `QUESTION ${cbtCurrentIndex + 1} OF ${cbtQuestions.length}`;
   const prevBtn = document.getElementById('cbtPrevBtn'), nextBtn = document.getElementById('cbtNextBtn');
   prevBtn.style.visibility = cbtCurrentIndex === 0 ? 'hidden' : 'visible';
-  if(cbtCurrentIndex === cbtQuestions.length - 1) { nextBtn.innerHTML = 'Submit Exam'; nextBtn.style.background = 'var(--warning)'; } 
+  if(cbtCurrentIndex === cbtQuestions.length - 1) { nextBtn.innerHTML = 'Submit Exam'; nextBtn.style.background = 'var(--warning)'; }
   else { nextBtn.innerHTML = 'Next &rarr;'; nextBtn.style.background = 'var(--ms-green)'; }
 }
 
 window.selectCbtOption = function(letter) { cbtAnswers[cbtCurrentIndex] = letter; renderCbtQuestion(); }
-window.navigateCbt = function(direction) { if (direction === 1 && cbtCurrentIndex === cbtQuestions.length - 1) { finishCbtExam(); } else { cbtCurrentIndex += direction; renderCbtQuestion(); } }
+window.navigateCbt = function(direction) {
+  if (direction === 1 && cbtCurrentIndex === cbtQuestions.length - 1) { finishCbtExam(); }
+  else { cbtCurrentIndex += direction; renderCbtQuestion(); }
+}
 
 async function executeCbtSave(resultData) {
-    document.getElementById('cbtSaveStatus').textContent = "Saving to database... Please do not close window.";
-    document.getElementById('cbtSaveStatus').style.color = "var(--warning)";
-    document.getElementById('cbtRetryBtn').style.display = "none";
-    try {
-        const results = await fetchSheet('CBT_Results');
-        if (!results.find(r => r.studentName === resultData.studentName && String(r.examId) === String(resultData.examId))) {
-            results.push(resultData);
-            await saveSheet('CBT_Results', results);
-        }
-        document.getElementById('cbtSaveStatus').textContent = "✅ Result successfully saved to database.";
-        document.getElementById('cbtSaveStatus').style.color = "var(--success)";
-    } catch(e) {
-        document.getElementById('cbtSaveStatus').textContent = "❌ Save failed. Please check connection.";
-        document.getElementById('cbtSaveStatus').style.color = "var(--error)";
-        document.getElementById('cbtRetryBtn').style.display = "inline-flex";
+  document.getElementById('cbtSaveStatus').textContent = "Saving to database... Please do not close window.";
+  document.getElementById('cbtSaveStatus').style.color = "var(--warning)";
+  document.getElementById('cbtRetryBtn').style.display = "none";
+  try {
+    const results = await fetchSheet('CBT_Results');
+    if (!results.find(r => r.studentName === resultData.studentName && String(r.examId) === String(resultData.examId))) {
+      results.push(resultData);
+      await saveSheet('CBT_Results', results);
     }
+    document.getElementById('cbtSaveStatus').textContent = "✅ Result successfully saved to database.";
+    document.getElementById('cbtSaveStatus').style.color = "var(--success)";
+  } catch(e) {
+    document.getElementById('cbtSaveStatus').textContent = "❌ Save failed. Please check connection.";
+    document.getElementById('cbtSaveStatus').style.color = "var(--error)";
+    document.getElementById('cbtRetryBtn').style.display = "inline-flex";
+  }
 }
 
 window.retrySaveCbt = function() { if(window.lastCbtResult) executeCbtSave(window.lastCbtResult); }
@@ -720,33 +1409,34 @@ function finishCbtExam(isAutoSubmit = false) {
   if(!isAutoSubmit && !confirm('Are you sure you want to submit your exam? You cannot change your answers after submitting.')) return;
   clearInterval(cbtTimerInterval); showLoader("Grading Exam...");
   setTimeout(() => {
-      try {
-          let score = 0; const totalQ = cbtQuestions.length || 1; 
-          cbtQuestions.forEach((q, idx) => { if(cbtAnswers[idx] && q.answer && String(cbtAnswers[idx]).trim().toUpperCase() === String(q.answer).trim().toUpperCase()) score++; });
-          const percentage = Math.round((score / totalQ) * 100);
-          window.lastCbtResult = { id: uid(), studentName: cbtStudentData.name, classBatch: cbtStudentData.batch, examId: cbtCurrentExam.id, examTitle: cbtCurrentExam.title, score: score, maxScore: totalQ, percentage: percentage, timestamp: new Date().toISOString() };
-          document.getElementById('cbtFinalScore').textContent = score;
-          document.getElementById('cbtTotalScore').textContent = totalQ;
-          document.getElementById('cbtFinalPercentage').textContent = `${percentage}%`;
-          document.getElementById('cbtFinalPercentage').style.color = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
-          document.getElementById('cbtFinalPercentage').style.borderColor = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
-          hideLoader(); showCbtScreen('cbtScreenResult'); executeCbtSave(window.lastCbtResult);
-      } catch(err) { hideLoader(); showToast('Grading Error: ' + err.message, 'error'); }
+    try {
+      let score = 0; const totalQ = cbtQuestions.length || 1;
+      cbtQuestions.forEach((q, idx) => { if(cbtAnswers[idx] && q.answer && String(cbtAnswers[idx]).trim().toUpperCase() === String(q.answer).trim().toUpperCase()) score++; });
+      const percentage = Math.round((score / totalQ) * 100);
+      window.lastCbtResult = { id: uid(), studentName: cbtStudentData.name, classBatch: cbtStudentData.batch, examId: cbtCurrentExam.id, examTitle: cbtCurrentExam.title, score: score, maxScore: totalQ, percentage: percentage, timestamp: new Date().toISOString() };
+      document.getElementById('cbtFinalScore').textContent = score;
+      document.getElementById('cbtTotalScore').textContent = totalQ;
+      document.getElementById('cbtFinalPercentage').textContent = `${percentage}%`;
+      document.getElementById('cbtFinalPercentage').style.color = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
+      document.getElementById('cbtFinalPercentage').style.borderColor = percentage >= 50 ? 'var(--ms-green)' : 'var(--error)';
+      hideLoader(); showCbtScreen('cbtScreenResult'); executeCbtSave(window.lastCbtResult);
+    } catch(err) { hideLoader(); showToast('Grading Error: ' + err.message, 'error'); }
   }, 100);
 }
 
+// ===================== DOWNLOAD CERTIFICATE =====================
 async function downloadCertificate(studentName, certId, mappedCertName) {
   const btn = document.querySelector('.btn-download'); const origHTML = btn.innerHTML;
-  btn.innerHTML = '<div class="loading-spinner"></div> Preparing Download...'; btn.disabled = true;
+  btn.innerHTML = '<div class="loader-circle" style="width:16px;height:16px;border-width:2px;margin-right:8px;"></div> Preparing...'; btn.disabled = true;
   try {
     const certificates = await fetchSheet('Certificates');
     const cert = certificates.find(c => String(c.id) === String(certId));
     if (!cert || !cert.fileData) { showToast('Certificate template not configured correctly.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; return; }
     if (cert.fileType === 'pdf') {
       const link = document.createElement('a'); link.href = cert.fileData; link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.pdf`; link.click();
-      await logDownload(studentName, cert, mappedCertName); showToast('Certificate downloaded successfully!', 'success'); btn.innerHTML = origHTML; btn.disabled = false;
+      await logDownload(studentName, cert, mappedCertName); showToast('Certificate downloaded!', 'success'); btn.innerHTML = origHTML; btn.disabled = false;
     } else {
-      const img = new Image(); img.crossOrigin = "Anonymous"; 
+      const img = new Image(); img.crossOrigin = "Anonymous";
       img.onload = async function () {
         const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
         const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0);
@@ -759,10 +1449,10 @@ async function downloadCertificate(studentName, certId, mappedCertName) {
           ctx.font = `${dateFontSize}px 'Georgia', serif`; ctx.textAlign = 'left'; ctx.fillText(`Date: ${dateStr}`, img.width * 0.18, img.height * 0.85);
         }
         const link = document.createElement('a'); link.href = canvas.toDataURL('image/png'); link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`; link.click();
-        await logDownload(studentName, cert, mappedCertName); showToast('Certificate downloaded successfully!', 'success'); btn.innerHTML = origHTML; btn.disabled = false;
+        await logDownload(studentName, cert, mappedCertName); showToast('Certificate downloaded!', 'success'); btn.innerHTML = origHTML; btn.disabled = false;
       };
       img.onerror = function() { showToast('Error loading image from GitHub.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; };
-      img.src = cert.fileData; 
+      img.src = cert.fileData;
     }
   } catch (e) { showToast('Download failed. Check connection.', 'error'); btn.innerHTML = origHTML; btn.disabled = false; }
 }
@@ -770,7 +1460,7 @@ async function downloadCertificate(studentName, certId, mappedCertName) {
 async function logDownload(studentName, cert, mappedCertName) {
   try {
     const notifs = await fetchSheet('Notifications');
-    notifs.unshift({ id: Date.now().toString(), studentName: studentName, certName: mappedCertName || cert.certName, course: 'Microsoft Office', classBatch: cert.classBatch, timestamp: new Date().toISOString(), read: false });
+    notifs.unshift({ id: Date.now().toString(), studentName, certName: mappedCertName || cert.certName, course: 'Microsoft Office', classBatch: cert.classBatch, timestamp: new Date().toISOString(), read: false });
     await saveSheet('Notifications', notifs);
     const students = await fetchSheet('Students');
     const idx = students.findIndex(s => (s.fullName || '').trim().toLowerCase() === studentName.trim().toLowerCase());
@@ -778,13 +1468,19 @@ async function logDownload(studentName, cert, mappedCertName) {
   } catch(e) {}
 }
 
+// ===================== LOGO FALLBACK =====================
 document.querySelectorAll('.logo-img-wrap img').forEach(img => {
   if (!img.complete || img.naturalWidth === 0) { img.style.display = 'none'; img.nextElementSibling.style.display = 'flex'; }
 });
 
-// START NEW LOGIC
+// ===================== KEYBOARD: Enter to search =====================
+document.getElementById('nameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') searchCertificate();
+});
+
+// ===================== INIT =====================
 window.addEventListener('DOMContentLoaded', () => {
-  loadShowcaseData(); // Fetch slider and quotes on load
+  loadShowcaseData();
 });
 </script>
 </body>
